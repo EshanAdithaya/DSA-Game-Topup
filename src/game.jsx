@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Zap, Trophy, Clock, Target, User, BarChart3, Sparkles, Brain, Award, RefreshCw, Loader } from 'lucide-react';
+import { Zap, Trophy, Clock, Target, LogOut, User, BarChart3, Sparkles, Brain, Award } from 'lucide-react';
 
 export default function QuantumQuestDemo() {
   const [gameState, setGameState] = useState('menu'); // menu, playing, results
   const [score, setScore] = useState(0);
   const [stability, setStability] = useState(100);
-  const [timeLeft, setTimeLeft] = useState(45);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [attempts, setAttempts] = useState(3);
   const [currentPuzzle, setCurrentPuzzle] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
@@ -15,18 +15,52 @@ export default function QuantumQuestDemo() {
   const [particles, setParticles] = useState([]);
   const [streak, setStreak] = useState(0);
   const [showCombo, setShowCombo] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState(false);
+
+  // Sample puzzles (simulating API responses)
+  const samplePuzzles = [
+    {
+      id: 1,
+      question: "You flip a fair coin 3 times. What's the probability of getting exactly 2 heads?",
+      options: ["1/8", "3/8", "1/2", "5/8"],
+      correct: "3/8",
+      difficulty: "Easy",
+      type: "Probability"
+    },
+    {
+      id: 2,
+      question: "A bag contains 4 red balls and 6 blue balls. What's the probability of drawing a red ball?",
+      options: ["0.2", "0.4", "0.5", "0.6"],
+      correct: "0.4",
+      difficulty: "Easy",
+      type: "Probability"
+    },
+    {
+      id: 3,
+      question: "What comes next in the sequence: 2, 6, 12, 20, 30, ?",
+      options: ["40", "42", "44", "48"],
+      correct: "42",
+      difficulty: "Medium",
+      type: "Pattern Recognition"
+    },
+    {
+      id: 4,
+      question: "You have two options: 70% chance to win $100 OR 100% chance to win $50. Expected value of first option?",
+      options: ["$50", "$60", "$70", "$80"],
+      correct: "$70",
+      difficulty: "Medium",
+      type: "Risk Assessment"
+    }
+  ];
 
   // Timer effect
   useEffect(() => {
-    if (gameState === 'playing' && timeLeft > 0 && !loading) {
+    if (gameState === 'playing' && timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
     } else if (gameState === 'playing' && timeLeft === 0) {
       handleTimeout();
     }
-  }, [timeLeft, gameState, loading]);
+  }, [timeLeft, gameState]);
 
   // Particle effect generator
   useEffect(() => {
@@ -47,55 +81,27 @@ export default function QuantumQuestDemo() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch puzzle from Heart Game API
-  const fetchPuzzle = async () => {
-    setLoading(true);
-    setApiError(false);
-    try {
-      const response = await fetch('https://marcconrad.com/uob/heart/api.php?out=json');
-      const data = await response.json();
-      
-      setCurrentPuzzle({
-        imageUrl: data.question,
-        solution: parseInt(data.solution),
-        carrots: data.carrots,
-        id: Date.now()
-      });
-      setLoading(false);
-      return true;
-    } catch (error) {
-      console.error('API Error:', error);
-      setApiError(true);
-      setLoading(false);
-      return false;
-    }
-  };
-
-  const startGame = async () => {
+  const startGame = () => {
+    const randomPuzzle = samplePuzzles[Math.floor(Math.random() * samplePuzzles.length)];
+    setCurrentPuzzle(randomPuzzle);
     setGameState('playing');
-    setTimeLeft(45);
+    setTimeLeft(30);
     setAttempts(3);
     setUserAnswer('');
     setFeedback('');
-    const success = await fetchPuzzle();
-    if (!success) {
-      setFeedback('⚠️ Unable to connect to Quantum Network. Please try again.');
-    }
   };
 
-  const handleAnswer = () => {
-    if (!userAnswer || userAnswer === '') return;
+  const handleAnswer = (answer) => {
+    setUserAnswer(answer);
     
-    const numAnswer = parseInt(userAnswer);
-    
-    if (numAnswer === currentPuzzle.solution) {
+    if (answer === currentPuzzle.correct) {
       const timeBonus = Math.floor(timeLeft * 2);
       const streakBonus = streak * 25;
-      const newScore = score + 150 + timeBonus + streakBonus;
+      const newScore = score + 100 + timeBonus + streakBonus;
       const newStreak = streak + 1;
       
       setScore(newScore);
-      setStability(Math.min(100, stability + 15));
+      setStability(Math.min(100, stability + 10));
       setStreak(newStreak);
       
       if (newStreak > 1) {
@@ -103,7 +109,7 @@ export default function QuantumQuestDemo() {
         setTimeout(() => setShowCombo(false), 2000);
       }
       
-      setFeedback(`✓ Correct! The answer is ${currentPuzzle.solution}! +${150 + timeBonus + streakBonus} points!`);
+      setFeedback(`✓ Correct! +${100 + timeBonus + streakBonus} points! Dimensional stability increased!`);
       setPuzzlesSolved(puzzlesSolved + 1);
       
       setTimeout(() => {
@@ -114,28 +120,27 @@ export default function QuantumQuestDemo() {
         } else {
           startGame();
         }
-      }, 3000);
+      }, 2000);
     } else {
       const newAttempts = attempts - 1;
       setAttempts(newAttempts);
-      setStability(Math.max(0, stability - 20));
+      setStability(Math.max(0, stability - 15));
       setStreak(0);
       
       if (newAttempts > 0) {
-        setFeedback(`✗ Incorrect! ${newAttempts} attempts remaining. Try again!`);
+        setFeedback(`✗ Incorrect! ${newAttempts} attempts remaining. Stability decreased!`);
         setUserAnswer('');
       } else {
-        setFeedback(`✗ Out of attempts! The correct answer was ${currentPuzzle.solution}`);
-        setTimeout(() => setGameState('results'), 3000);
+        setFeedback('✗ Out of attempts! Reality destabilized...');
+        setTimeout(() => setGameState('results'), 2000);
       }
     }
   };
 
   const handleTimeout = () => {
-    setFeedback(`⏰ Time's up! The answer was ${currentPuzzle.solution}. Moving on...`);
-    setStability(Math.max(0, stability - 25));
-    setStreak(0);
-    setTimeout(() => startGame(), 3000);
+    setFeedback('⏰ Time\'s up! Moving to next challenge...');
+    setStability(Math.max(0, stability - 20));
+    setTimeout(() => startGame(), 2000);
   };
 
   const resetGame = () => {
@@ -143,14 +148,7 @@ export default function QuantumQuestDemo() {
     setStability(100);
     setDimensionLevel(1);
     setPuzzlesSolved(0);
-    setStreak(0);
     setGameState('menu');
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !feedback && userAnswer) {
-      handleAnswer();
-    }
   };
 
   return (
@@ -187,13 +185,13 @@ export default function QuantumQuestDemo() {
           0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
           50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
         }
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); }
+          50% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.8); }
+        }
         @keyframes slide-up {
           from { transform: translateY(20px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes pulse-border {
-          0%, 100% { border-color: rgba(147, 51, 234, 0.5); }
-          50% { border-color: rgba(6, 182, 212, 0.8); }
         }
         .card-hover {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -213,7 +211,7 @@ export default function QuantumQuestDemo() {
               <h1 className="text-5xl font-black bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent mb-1 tracking-tight">
                 QuantumQuest
               </h1>
-              <p className="text-purple-300 text-sm font-semibold tracking-wide">THE HEART GAME CHALLENGE</p>
+              <p className="text-purple-300 text-sm font-semibold tracking-wide">THE PROBABILITY PARADOX</p>
             </div>
           </div>
           
@@ -266,13 +264,13 @@ export default function QuantumQuestDemo() {
               <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
               <div className="relative z-10 text-center">
                 <div className="inline-block bg-gradient-to-r from-cyan-500/20 to-purple-500/20 px-4 py-1 rounded-full text-sm font-bold text-cyan-300 mb-4 border border-cyan-400/30">
-                  🌌 Powered by Heart Game API
+                  🌌 Quantum Explorer Dashboard
                 </div>
                 <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
-                  Solve Visual Pattern Puzzles
+                  Navigate Through Quantum Dimensions
                 </h2>
                 <p className="text-lg text-purple-200 mb-3 max-w-2xl mx-auto">
-                  Decode mathematical patterns from Heart Game API puzzles and maintain dimensional stability
+                  Solve probability puzzles to maintain reality stability and unlock higher dimensions
                 </p>
                 <div className="inline-flex items-center gap-2 bg-purple-500/20 px-4 py-2 rounded-lg border border-purple-400/30">
                   <Brain className="w-5 h-5 text-purple-300" />
@@ -295,23 +293,33 @@ export default function QuantumQuestDemo() {
                 <div className="relative z-10">
                   <Zap className="w-12 h-12 mb-3 mx-auto text-yellow-300 drop-shadow-lg" />
                   <div className="font-black text-2xl mb-2">Start Exploration</div>
-                  <div className="text-sm text-cyan-100 font-medium">Fetch puzzle from API</div>
+                  <div className="text-sm text-cyan-100 font-medium">Begin your quantum journey</div>
                 </div>
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-yellow-400/20 rounded-full blur-2xl group-hover:bg-yellow-400/30 transition-all"></div>
               </button>
 
-              <button className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg" style={{ animation: 'slide-up 1s ease-out 0.2s backwards' }}>
+              <button 
+                className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg"
+                style={{ animation: 'slide-up 1s ease-out 0.2s backwards' }}
+              >
                 <BarChart3 className="w-12 h-12 mb-3 mx-auto text-purple-400" />
                 <div className="font-black text-2xl mb-2">Dimensional Archive</div>
                 <div className="text-sm text-purple-300 font-medium">View past explorations</div>
               </button>
 
-              <button className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg" style={{ animation: 'slide-up 1s ease-out 0.3s backwards' }}>
+              <button 
+                className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg"
+                style={{ animation: 'slide-up 1s ease-out 0.3s backwards' }}
+              >
                 <Trophy className="w-12 h-12 mb-3 mx-auto text-yellow-400" />
                 <div className="font-black text-2xl mb-2">Quantum Leaderboard</div>
                 <div className="text-sm text-purple-300 font-medium">Global rankings</div>
               </button>
 
-              <button className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg" style={{ animation: 'slide-up 1s ease-out 0.4s backwards' }}>
+              <button 
+                className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg"
+                style={{ animation: 'slide-up 1s ease-out 0.4s backwards' }}
+              >
                 <User className="w-12 h-12 mb-3 mx-auto text-cyan-400" />
                 <div className="font-black text-2xl mb-2">Explorer Profile</div>
                 <div className="text-sm text-purple-300 font-medium">Manage your settings</div>
@@ -319,7 +327,10 @@ export default function QuantumQuestDemo() {
             </div>
 
             {/* How to Play */}
-            <div className="bg-gradient-to-br from-purple-900/30 to-indigo-900/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-400/30 shadow-lg" style={{ animation: 'slide-up 1s ease-out 0.5s backwards' }}>
+            <div 
+              className="bg-gradient-to-br from-purple-900/30 to-indigo-900/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-400/30 shadow-lg"
+              style={{ animation: 'slide-up 1s ease-out 0.5s backwards' }}
+            >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
                   <Sparkles className="w-6 h-6" />
@@ -331,13 +342,13 @@ export default function QuantumQuestDemo() {
                   <div className="w-6 h-6 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-xs font-bold">1</span>
                   </div>
-                  <p className="text-purple-100">Analyze visual puzzles from the Heart Game API</p>
+                  <p className="text-purple-100">Solve probability puzzles to maintain dimensional stability</p>
                 </div>
                 <div className="flex items-start gap-3 bg-purple-800/20 rounded-lg p-3">
                   <div className="w-6 h-6 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-xs font-bold">2</span>
                   </div>
-                  <p className="text-purple-100">Find the pattern and enter the correct number</p>
+                  <p className="text-purple-100">Correct answers increase stability and score</p>
                 </div>
                 <div className="flex items-start gap-3 bg-purple-800/20 rounded-lg p-3">
                   <div className="w-6 h-6 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -349,21 +360,24 @@ export default function QuantumQuestDemo() {
                   <div className="w-6 h-6 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-xs font-bold">4</span>
                   </div>
-                  <p className="text-purple-100">Solve 3 puzzles to advance to next dimension</p>
+                  <p className="text-purple-100">Complete 3 puzzles to advance dimensions</p>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {gameState === 'playing' && (
+        {gameState === 'playing' && currentPuzzle && (
           <div className="relative" style={{ animation: 'slide-up 0.6s ease-out' }}>
-            <div className="bg-gradient-to-br from-slate-800/50 to-purple-900/50 backdrop-blur-xl rounded-2xl p-6 border border-purple-400/30 shadow-2xl">
-              {/* Puzzle Header */}
+            {/* Puzzle Header */}
+            <div className="bg-gradient-to-br from-slate-800/50 to-purple-900/50 backdrop-blur-xl rounded-2xl p-6 border border-purple-400/30 shadow-2xl mb-6">
               <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
                 <div className="flex gap-3">
+                  <div className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-600/50 to-pink-600/50 border border-purple-400/40 font-bold text-sm backdrop-blur-sm">
+                    {currentPuzzle.type}
+                  </div>
                   <div className="px-4 py-2 rounded-full bg-gradient-to-r from-cyan-600/50 to-blue-600/50 border border-cyan-400/40 font-bold text-sm backdrop-blur-sm">
-                    Heart Puzzle #{currentPuzzle?.id}
+                    {currentPuzzle.difficulty}
                   </div>
                   <div className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600/50 to-purple-600/50 border border-indigo-400/40 font-bold text-sm backdrop-blur-sm">
                     Puzzle {puzzlesSolved + 1}/3
@@ -371,10 +385,10 @@ export default function QuantumQuestDemo() {
                 </div>
                 <div className="flex gap-4">
                   <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold ${
-                    timeLeft < 15 ? 'bg-red-500/30 border-2 border-red-400 animate-pulse' : 'bg-cyan-500/20 border border-cyan-400/40'
+                    timeLeft < 10 ? 'bg-red-500/30 border-2 border-red-400 animate-pulse' : 'bg-cyan-500/20 border border-cyan-400/40'
                   }`}>
                     <Clock className="w-6 h-6 text-cyan-300" />
-                    <span className={`text-2xl ${timeLeft < 15 ? 'text-red-300' : 'text-cyan-200'}`}>
+                    <span className={`text-2xl ${timeLeft < 10 ? 'text-red-300' : 'text-cyan-200'}`}>
                       {timeLeft}s
                     </span>
                   </div>
@@ -385,8 +399,8 @@ export default function QuantumQuestDemo() {
                 </div>
               </div>
 
-              {/* Stability Bar */}
-              <div className="mb-6">
+              {/* Stability Bar with Glow */}
+              <div className="mb-4">
                 <div className="flex justify-between text-sm mb-2 font-semibold">
                   <span className="text-purple-200">Dimensional Stability</span>
                   <span className="text-xl font-black">{stability}%</span>
@@ -410,80 +424,48 @@ export default function QuantumQuestDemo() {
                 </div>
               </div>
 
-              {/* Puzzle Image */}
-              {loading ? (
-                <div className="bg-gradient-to-br from-purple-900/50 to-indigo-900/50 rounded-xl p-12 mb-6 border-2 border-purple-400/40 text-center">
-                  <Loader className="w-16 h-16 mx-auto mb-4 text-cyan-400 animate-spin" />
-                  <p className="text-xl font-bold text-purple-200">Fetching puzzle from Quantum Network...</p>
-                  <p className="text-sm text-purple-300 mt-2">Connecting to Heart Game API</p>
-                </div>
-              ) : currentPuzzle && !apiError ? (
-                <div className="bg-gradient-to-br from-purple-900/50 to-indigo-900/50 rounded-xl p-6 mb-6 border-2 border-purple-400/40 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Brain className="w-6 h-6 text-purple-300" />
-                      <span className="text-sm font-bold text-purple-300 uppercase tracking-wider">Analyze the Pattern</span>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-4 mb-4 flex items-center justify-center" style={{ minHeight: '300px' }}>
-                      <img 
-                        src={currentPuzzle.imageUrl} 
-                        alt="Puzzle" 
-                        className="max-w-full max-h-96 rounded-lg shadow-2xl"
-                        style={{ animation: 'slide-up 0.5s ease-out' }}
-                      />
-                    </div>
-                    <p className="text-center text-purple-200 text-sm">
-                      What number do you see in this pattern?
-                    </p>
+              {/* Question */}
+              <div className="bg-gradient-to-br from-purple-900/50 to-indigo-900/50 rounded-xl p-8 mb-6 border-2 border-purple-400/40 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Brain className="w-6 h-6 text-purple-300" />
+                    <span className="text-sm font-bold text-purple-300 uppercase tracking-wider">Challenge</span>
                   </div>
+                  <h3 className="text-2xl font-bold text-white leading-relaxed">{currentPuzzle.question}</h3>
                 </div>
-              ) : (
-                <div className="bg-red-900/30 rounded-xl p-8 mb-6 border-2 border-red-400/40 text-center">
-                  <p className="text-xl font-bold text-red-200 mb-2">⚠️ Quantum Network Error</p>
-                  <p className="text-sm text-red-300">Unable to fetch puzzle from Heart Game API</p>
-                  <button 
-                    onClick={startGame}
-                    className="mt-4 bg-gradient-to-r from-cyan-600 to-purple-600 px-6 py-2 rounded-lg font-bold"
-                  >
-                    <RefreshCw className="w-4 h-4 inline mr-2" />
-                    Try Again
-                  </button>
-                </div>
-              )}
+              </div>
 
-              {/* Answer Input */}
-              {!loading && currentPuzzle && !apiError && (
-                <div className="mb-6">
-                  <label className="block text-sm font-bold text-purple-200 mb-3">Enter Your Answer:</label>
-                  <div className="flex gap-3">
-                    <input
-                      type="number"
-                      value={userAnswer}
-                      onChange={(e) => setUserAnswer(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      disabled={!!feedback}
-                      placeholder="Enter a number..."
-                      className="flex-1 bg-slate-900/50 border-2 border-purple-400/40 rounded-lg px-6 py-4 text-2xl font-bold text-white placeholder-purple-400/50 focus:outline-none focus:border-cyan-400 disabled:opacity-50"
-                      style={{ animation: 'pulse-border 2s ease-in-out infinite' }}
-                    />
-                    <button
-                      onClick={handleAnswer}
-                      disabled={!!feedback || !userAnswer}
-                      className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700 px-8 py-4 rounded-lg font-black text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* Answer Options */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                {currentPuzzle.options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswer(option)}
+                    disabled={!!feedback}
+                    className={`group p-6 rounded-xl border-2 transition-all transform font-bold text-lg relative overflow-hidden ${
+                      userAnswer === option
+                        ? option === currentPuzzle.correct
+                          ? 'bg-green-500/30 border-green-400 scale-105 shadow-lg shadow-green-500/50'
+                          : 'bg-red-500/30 border-red-400 scale-95'
+                        : 'bg-slate-800/50 border-purple-400/30 hover:bg-slate-700/50 hover:border-purple-400 hover:scale-105 hover:shadow-xl card-hover'
+                    } ${feedback ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-white/5 group-hover:from-white/5 group-hover:to-white/10 transition-all"></div>
+                    <div className="relative z-10 flex items-center justify-center gap-2">
+                      <span className="text-purple-300 font-black text-sm">{String.fromCharCode(65 + index)}.</span>
+                      <span>{option}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
 
               {/* Feedback */}
               {feedback && (
                 <div 
                   className={`p-5 rounded-xl text-center font-bold text-lg border-2 ${
-                    feedback.includes('Correct') || feedback.includes('✓') ? 'bg-green-500/20 text-green-200 border-green-400/50 shadow-lg shadow-green-500/30' :
-                    feedback.includes('Time') || feedback.includes('⏰') ? 'bg-yellow-500/20 text-yellow-200 border-yellow-400/50' :
+                    feedback.includes('Correct') ? 'bg-green-500/20 text-green-200 border-green-400/50 shadow-lg shadow-green-500/30' :
+                    feedback.includes('Time') ? 'bg-yellow-500/20 text-yellow-200 border-yellow-400/50' :
                     'bg-red-500/20 text-red-200 border-red-400/50 shadow-lg shadow-red-500/30'
                   }`}
                   style={{ animation: 'slide-up 0.3s ease-out' }}
@@ -528,9 +510,9 @@ export default function QuantumQuestDemo() {
 
                 <div className="bg-purple-900/30 rounded-xl p-6 mb-8 border border-purple-400/30">
                   <p className="text-xl text-purple-100 font-semibold">
-                    {stability > 70 ? '⭐ Exceptional pattern recognition! You\'re a quantum master!' :
-                     stability > 40 ? '👍 Solid performance! Keep practicing those visual puzzles.' :
-                     '💪 Every puzzle makes you stronger. Try again, Explorer!'}
+                    {stability > 70 ? '⭐ Exceptional quantum navigation! You\'re a master explorer!' :
+                     stability > 40 ? '👍 Solid performance! Keep refining those probability skills.' :
+                     '💪 Every journey strengthens you. Try again, Explorer!'}
                   </p>
                 </div>
 
@@ -558,7 +540,7 @@ export default function QuantumQuestDemo() {
       <div className="max-w-6xl mx-auto mt-10 text-center relative z-10">
         <div className="bg-slate-900/30 backdrop-blur-sm rounded-lg px-6 py-3 inline-block border border-purple-400/20">
           <p className="text-purple-300 text-sm font-medium">
-            ⚡ Powered by <span className="text-cyan-400 font-bold">Heart Game API</span> • Real-time puzzle fetching • Distributed service architecture
+            ⚡ Powered by <span className="text-cyan-400 font-bold">Heart Game API</span> • Demonstrating distributed service architecture
           </p>
         </div>
       </div>
