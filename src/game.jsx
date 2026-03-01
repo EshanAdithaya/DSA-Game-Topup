@@ -1,549 +1,955 @@
-import React, { useState, useEffect } from 'react';
-import { Zap, Trophy, Clock, Target, LogOut, User, BarChart3, Sparkles, Brain, Award } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { api } from './services/api';
 
-export default function QuantumQuestDemo() {
-  const [gameState, setGameState] = useState('menu'); // menu, playing, results
-  const [score, setScore] = useState(0);
-  const [stability, setStability] = useState(100);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [attempts, setAttempts] = useState(3);
-  const [currentPuzzle, setCurrentPuzzle] = useState(null);
-  const [userAnswer, setUserAnswer] = useState('');
-  const [feedback, setFeedback] = useState('');
-  const [dimensionLevel, setDimensionLevel] = useState(1);
-  const [puzzlesSolved, setPuzzlesSolved] = useState(0);
-  const [particles, setParticles] = useState([]);
-  const [streak, setStreak] = useState(0);
-  const [showCombo, setShowCombo] = useState(false);
+// ─── Utility helpers ───────────────────────────────────────────────────────────
 
-  // Sample puzzles (simulating API responses)
-  const samplePuzzles = [
-    {
-      id: 1,
-      question: "You flip a fair coin 3 times. What's the probability of getting exactly 2 heads?",
-      options: ["1/8", "3/8", "1/2", "5/8"],
-      correct: "3/8",
-      difficulty: "Easy",
-      type: "Probability"
-    },
-    {
-      id: 2,
-      question: "A bag contains 4 red balls and 6 blue balls. What's the probability of drawing a red ball?",
-      options: ["0.2", "0.4", "0.5", "0.6"],
-      correct: "0.4",
-      difficulty: "Easy",
-      type: "Probability"
-    },
-    {
-      id: 3,
-      question: "What comes next in the sequence: 2, 6, 12, 20, 30, ?",
-      options: ["40", "42", "44", "48"],
-      correct: "42",
-      difficulty: "Medium",
-      type: "Pattern Recognition"
-    },
-    {
-      id: 4,
-      question: "You have two options: 70% chance to win $100 OR 100% chance to win $50. Expected value of first option?",
-      options: ["$50", "$60", "$70", "$80"],
-      correct: "$70",
-      difficulty: "Medium",
-      type: "Risk Assessment"
-    }
-  ];
+function StabilityBar({ value }) {
+  const color = value > 60 ? '#00ff88' : value > 30 ? '#ffcc00' : '#ff4466';
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 8, overflow: 'hidden', height: 12 }}>
+      <div
+        style={{
+          width: `${Math.max(0, Math.min(100, value))}%`,
+          height: '100%',
+          background: `linear-gradient(90deg, ${color}88, ${color})`,
+          borderRadius: 8,
+          transition: 'width 0.4s ease, background 0.4s ease',
+          boxShadow: `0 0 12px ${color}66`,
+        }}
+      />
+    </div>
+  );
+}
 
-  // Timer effect
-  useEffect(() => {
-    if (gameState === 'playing' && timeLeft > 0) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (gameState === 'playing' && timeLeft === 0) {
-      handleTimeout();
-    }
-  }, [timeLeft, gameState]);
-
-  // Particle effect generator
-  useEffect(() => {
-    const generateParticles = () => {
-      const newParticles = Array.from({ length: 30 }, (_, i) => ({
-        id: Math.random(),
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 3 + 1,
-        duration: Math.random() * 3 + 2,
-        delay: Math.random() * 2
-      }));
-      setParticles(newParticles);
-    };
-    
-    generateParticles();
-    const interval = setInterval(generateParticles, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const startGame = () => {
-    const randomPuzzle = samplePuzzles[Math.floor(Math.random() * samplePuzzles.length)];
-    setCurrentPuzzle(randomPuzzle);
-    setGameState('playing');
-    setTimeLeft(30);
-    setAttempts(3);
-    setUserAnswer('');
-    setFeedback('');
-  };
-
-  const handleAnswer = (answer) => {
-    setUserAnswer(answer);
-    
-    if (answer === currentPuzzle.correct) {
-      const timeBonus = Math.floor(timeLeft * 2);
-      const streakBonus = streak * 25;
-      const newScore = score + 100 + timeBonus + streakBonus;
-      const newStreak = streak + 1;
-      
-      setScore(newScore);
-      setStability(Math.min(100, stability + 10));
-      setStreak(newStreak);
-      
-      if (newStreak > 1) {
-        setShowCombo(true);
-        setTimeout(() => setShowCombo(false), 2000);
-      }
-      
-      setFeedback(`✓ Correct! +${100 + timeBonus + streakBonus} points! Dimensional stability increased!`);
-      setPuzzlesSolved(puzzlesSolved + 1);
-      
-      setTimeout(() => {
-        if (puzzlesSolved + 1 >= 3) {
-          setDimensionLevel(dimensionLevel + 1);
-          setPuzzlesSolved(0);
-          setGameState('results');
-        } else {
-          startGame();
+function Particles() {
+  const particles = Array.from({ length: 18 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 3 + 1,
+    duration: Math.random() * 8 + 4,
+    delay: Math.random() * 4,
+  }));
+  return (
+    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          style={{
+            position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
+            width: p.size, height: p.size, borderRadius: '50%',
+            background: i => i % 2 === 0 ? '#7c3aed' : '#00ccff',
+            opacity: 0.35,
+            animation: `floatUp ${p.duration}s ${p.delay}s ease-in-out infinite alternate`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes floatUp {
+          0% { transform: translateY(0) scale(1); opacity: 0.2; }
+          100% { transform: translateY(-40px) scale(1.4); opacity: 0.5; }
         }
-      }, 2000);
-    } else {
-      const newAttempts = attempts - 1;
-      setAttempts(newAttempts);
-      setStability(Math.max(0, stability - 15));
-      setStreak(0);
-      
-      if (newAttempts > 0) {
-        setFeedback(`✗ Incorrect! ${newAttempts} attempts remaining. Stability decreased!`);
-        setUserAnswer('');
-      } else {
-        setFeedback('✗ Out of attempts! Reality destabilized...');
-        setTimeout(() => setGameState('results'), 2000);
-      }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        button:hover { opacity: 0.92; }
+        input:focus { border-color: rgba(124,58,237,0.6) !important; outline: none !important; }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Auth Screen ───────────────────────────────────────────────────────────────
+
+function AuthScreen({ onAuth }) {
+  const [mode, setMode] = useState('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (mode === 'register' && password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
     }
-  };
-
-  const handleTimeout = () => {
-    setFeedback('⏰ Time\'s up! Moving to next challenge...');
-    setStability(Math.max(0, stability - 20));
-    setTimeout(() => startGame(), 2000);
-  };
-
-  const resetGame = () => {
-    setScore(0);
-    setStability(100);
-    setDimensionLevel(1);
-    setPuzzlesSolved(0);
-    setGameState('menu');
+    setLoading(true);
+    try {
+      const result = mode === 'register'
+        ? await api.register(email, password, username)
+        : await api.login(email, password);
+      api.setToken(result.token);
+      onAuth(result.user);
+    } catch (err) {
+      setError(err.message || 'Authentication failed. Check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 text-white p-6 overflow-hidden relative">
-      {/* Animated Background Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {particles.map(particle => (
-          <div
-            key={particle.id}
-            className="absolute rounded-full bg-cyan-400/20 blur-sm"
-            style={{
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              animation: `float ${particle.duration}s ease-in-out infinite`,
-              animationDelay: `${particle.delay}s`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Combo Notification */}
-      {showCombo && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 animate-bounce">
-          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-6 rounded-2xl font-black text-4xl shadow-2xl border-4 border-white">
-            🔥 {streak}x COMBO! 🔥
-          </div>
+    <div style={S.page}>
+      <Particles />
+      <div style={S.authCard}>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div style={{ fontSize: 52 }}>⚛</div>
+          <h1 style={S.gradTitle}>QuantumQuest</h1>
+          <p style={S.sub}>THE PROBABILITY PARADOX</p>
         </div>
-      )}
 
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-          50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); }
-          50% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.8); }
-        }
-        @keyframes slide-up {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        .card-hover {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-hover:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-      `}</style>
-
-      {/* Header */}
-      <div className="max-w-6xl mx-auto mb-8 relative z-10" style={{ animation: 'slide-up 0.6s ease-out' }}>
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg blur opacity-30"></div>
-            <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-lg px-6 py-4 border border-cyan-500/30">
-              <h1 className="text-5xl font-black bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent mb-1 tracking-tight">
-                QuantumQuest
-              </h1>
-              <p className="text-purple-300 text-sm font-semibold tracking-wide">THE PROBABILITY PARADOX</p>
-            </div>
-          </div>
-          
-          <div className="flex gap-3">
-            {streak > 0 && (
-              <div className="bg-gradient-to-br from-orange-500 to-red-500 backdrop-blur-sm rounded-xl px-4 py-2 border-2 border-yellow-400/50 shadow-lg animate-pulse">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-yellow-200" />
-                  <div>
-                    <div className="text-xs text-yellow-100 font-bold">STREAK</div>
-                    <div className="text-xl font-black text-white">{streak}x</div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-yellow-400/40 shadow-lg">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-yellow-400" />
-                <div>
-                  <div className="text-xs text-yellow-300 font-semibold">Score</div>
-                  <div className="text-2xl font-black bg-gradient-to-r from-yellow-200 to-orange-200 bg-clip-text text-transparent">
-                    {score.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-cyan-400/40 shadow-lg">
-              <div className="flex items-center gap-2">
-                <Zap className="w-6 h-6 text-cyan-400" />
-                <div>
-                  <div className="text-xs text-cyan-300 font-semibold">Stability</div>
-                  <div className="text-2xl font-black bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
-                    {stability}%
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div style={S.tabRow}>
+          {['login', 'register'].map((m) => (
+            <button key={m} onClick={() => { setMode(m); setError(''); }} style={{ ...S.tab, ...(mode === m ? S.tabOn : {}) }}>
+              {m === 'login' ? 'Sign In' : 'Register'}
+            </button>
+          ))}
         </div>
+
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {mode === 'register' && (
+            <input style={S.input} type="text" placeholder="Explorer Name" value={username}
+              onChange={e => setUsername(e.target.value)} required />
+          )}
+          <input style={S.input} type="email" placeholder="Email" value={email}
+            onChange={e => setEmail(e.target.value)} required />
+          <input style={S.input} type="password" placeholder="Password (min 8 chars)" value={password}
+            onChange={e => setPassword(e.target.value)} required />
+          {error && <div style={S.errBox}>{error}</div>}
+          <button type="submit" disabled={loading} style={S.btnPrimary}>
+            {loading ? 'Processing…' : mode === 'login' ? '⚛ Enter the Quantum Realm' : '🚀 Begin Your Journey'}
+          </button>
+        </form>
+
+        <p style={{ textAlign: 'center', marginTop: 18, color: '#64748b', fontSize: 14 }}>
+          {mode === 'login' ? "No account? " : "Already an explorer? "}
+          <button onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }} style={S.linkBtn}>
+            {mode === 'login' ? 'Register' : 'Sign In'}
+          </button>
+        </p>
       </div>
+    </div>
+  );
+}
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto relative z-10">
-        {gameState === 'menu' && (
-          <div className="space-y-6" style={{ animation: 'slide-up 0.8s ease-out' }}>
-            {/* Hero Section */}
-            <div className="relative bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-xl rounded-3xl p-8 border border-purple-400/30 shadow-2xl overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
-              <div className="relative z-10 text-center">
-                <div className="inline-block bg-gradient-to-r from-cyan-500/20 to-purple-500/20 px-4 py-1 rounded-full text-sm font-bold text-cyan-300 mb-4 border border-cyan-400/30">
-                  🌌 Quantum Explorer Dashboard
-                </div>
-                <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
-                  Navigate Through Quantum Dimensions
-                </h2>
-                <p className="text-lg text-purple-200 mb-3 max-w-2xl mx-auto">
-                  Solve probability puzzles to maintain reality stability and unlock higher dimensions
-                </p>
-                <div className="inline-flex items-center gap-2 bg-purple-500/20 px-4 py-2 rounded-lg border border-purple-400/30">
-                  <Brain className="w-5 h-5 text-purple-300" />
-                  <span className="text-sm font-semibold">Current Dimension: </span>
-                  <span className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    Level {dimensionLevel}
-                  </span>
-                </div>
-              </div>
-            </div>
+// ─── Menu Screen ───────────────────────────────────────────────────────────────
 
-            {/* Action Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button
-                onClick={startGame}
-                className="relative group card-hover bg-gradient-to-br from-cyan-600 to-purple-600 p-8 rounded-2xl transition-all shadow-xl border-2 border-cyan-400/50 overflow-hidden"
-                style={{ animation: 'slide-up 1s ease-out 0.1s backwards' }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-white/10 group-hover:from-white/10 group-hover:to-white/20 transition-all"></div>
-                <div className="relative z-10">
-                  <Zap className="w-12 h-12 mb-3 mx-auto text-yellow-300 drop-shadow-lg" />
-                  <div className="font-black text-2xl mb-2">Start Exploration</div>
-                  <div className="text-sm text-cyan-100 font-medium">Begin your quantum journey</div>
-                </div>
-                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-yellow-400/20 rounded-full blur-2xl group-hover:bg-yellow-400/30 transition-all"></div>
-              </button>
-
-              <button 
-                className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg"
-                style={{ animation: 'slide-up 1s ease-out 0.2s backwards' }}
-              >
-                <BarChart3 className="w-12 h-12 mb-3 mx-auto text-purple-400" />
-                <div className="font-black text-2xl mb-2">Dimensional Archive</div>
-                <div className="text-sm text-purple-300 font-medium">View past explorations</div>
-              </button>
-
-              <button 
-                className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg"
-                style={{ animation: 'slide-up 1s ease-out 0.3s backwards' }}
-              >
-                <Trophy className="w-12 h-12 mb-3 mx-auto text-yellow-400" />
-                <div className="font-black text-2xl mb-2">Quantum Leaderboard</div>
-                <div className="text-sm text-purple-300 font-medium">Global rankings</div>
-              </button>
-
-              <button 
-                className="card-hover bg-slate-800/50 backdrop-blur-sm hover:bg-slate-800/70 p-8 rounded-2xl transition-all border border-purple-400/20 hover:border-purple-400/40 shadow-lg"
-                style={{ animation: 'slide-up 1s ease-out 0.4s backwards' }}
-              >
-                <User className="w-12 h-12 mb-3 mx-auto text-cyan-400" />
-                <div className="font-black text-2xl mb-2">Explorer Profile</div>
-                <div className="text-sm text-purple-300 font-medium">Manage your settings</div>
-              </button>
-            </div>
-
-            {/* How to Play */}
-            <div 
-              className="bg-gradient-to-br from-purple-900/30 to-indigo-900/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-400/30 shadow-lg"
-              style={{ animation: 'slide-up 1s ease-out 0.5s backwards' }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
-                  <Sparkles className="w-6 h-6" />
-                </div>
-                <h3 className="text-2xl font-black">How to Play</h3>
-              </div>
-              <div className="grid md:grid-cols-2 gap-3 text-sm">
-                <div className="flex items-start gap-3 bg-purple-800/20 rounded-lg p-3">
-                  <div className="w-6 h-6 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-xs font-bold">1</span>
-                  </div>
-                  <p className="text-purple-100">Solve probability puzzles to maintain dimensional stability</p>
-                </div>
-                <div className="flex items-start gap-3 bg-purple-800/20 rounded-lg p-3">
-                  <div className="w-6 h-6 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-xs font-bold">2</span>
-                  </div>
-                  <p className="text-purple-100">Correct answers increase stability and score</p>
-                </div>
-                <div className="flex items-start gap-3 bg-purple-800/20 rounded-lg p-3">
-                  <div className="w-6 h-6 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-xs font-bold">3</span>
-                  </div>
-                  <p className="text-purple-100">Build streaks for massive combo bonuses!</p>
-                </div>
-                <div className="flex items-start gap-3 bg-purple-800/20 rounded-lg p-3">
-                  <div className="w-6 h-6 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-xs font-bold">4</span>
-                  </div>
-                  <p className="text-purple-100">Complete 3 puzzles to advance dimensions</p>
-                </div>
-              </div>
-            </div>
+function MenuScreen({ user, onStart, onLeaderboard, onProfile, onLogout }) {
+  return (
+    <div style={S.page}>
+      <Particles />
+      <div style={{ ...S.container, maxWidth: 820, animation: 'fadeIn 0.5s ease' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 14 }}>
+          <div>
+            <h1 style={S.gradTitle}>⚛ QuantumQuest</h1>
+            <p style={S.sub}>THE PROBABILITY PARADOX</p>
           </div>
-        )}
-
-        {gameState === 'playing' && currentPuzzle && (
-          <div className="relative" style={{ animation: 'slide-up 0.6s ease-out' }}>
-            {/* Puzzle Header */}
-            <div className="bg-gradient-to-br from-slate-800/50 to-purple-900/50 backdrop-blur-xl rounded-2xl p-6 border border-purple-400/30 shadow-2xl mb-6">
-              <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-                <div className="flex gap-3">
-                  <div className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-600/50 to-pink-600/50 border border-purple-400/40 font-bold text-sm backdrop-blur-sm">
-                    {currentPuzzle.type}
-                  </div>
-                  <div className="px-4 py-2 rounded-full bg-gradient-to-r from-cyan-600/50 to-blue-600/50 border border-cyan-400/40 font-bold text-sm backdrop-blur-sm">
-                    {currentPuzzle.difficulty}
-                  </div>
-                  <div className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600/50 to-purple-600/50 border border-indigo-400/40 font-bold text-sm backdrop-blur-sm">
-                    Puzzle {puzzlesSolved + 1}/3
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold ${
-                    timeLeft < 10 ? 'bg-red-500/30 border-2 border-red-400 animate-pulse' : 'bg-cyan-500/20 border border-cyan-400/40'
-                  }`}>
-                    <Clock className="w-6 h-6 text-cyan-300" />
-                    <span className={`text-2xl ${timeLeft < 10 ? 'text-red-300' : 'text-cyan-200'}`}>
-                      {timeLeft}s
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-500/20 border border-yellow-400/40 font-bold">
-                    <Target className="w-6 h-6 text-yellow-300" />
-                    <span className="text-2xl text-yellow-200">{attempts}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stability Bar with Glow */}
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-2 font-semibold">
-                  <span className="text-purple-200">Dimensional Stability</span>
-                  <span className="text-xl font-black">{stability}%</span>
-                </div>
-                <div className="h-4 bg-black/40 rounded-full overflow-hidden border border-purple-400/30">
-                  <div
-                    className={`h-full transition-all duration-500 relative ${
-                      stability > 70 ? 'bg-gradient-to-r from-green-400 to-cyan-400' :
-                      stability > 40 ? 'bg-gradient-to-r from-yellow-400 to-orange-400' :
-                      'bg-gradient-to-r from-red-400 to-pink-400'
-                    }`}
-                    style={{ 
-                      width: `${stability}%`,
-                      boxShadow: stability > 70 ? '0 0 20px rgba(34, 197, 94, 0.6)' : 
-                                 stability > 40 ? '0 0 20px rgba(251, 146, 60, 0.6)' :
-                                 '0 0 20px rgba(244, 63, 94, 0.6)'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Question */}
-              <div className="bg-gradient-to-br from-purple-900/50 to-indigo-900/50 rounded-xl p-8 mb-6 border-2 border-purple-400/40 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Brain className="w-6 h-6 text-purple-300" />
-                    <span className="text-sm font-bold text-purple-300 uppercase tracking-wider">Challenge</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-white leading-relaxed">{currentPuzzle.question}</h3>
-                </div>
-              </div>
-
-              {/* Answer Options */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {currentPuzzle.options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswer(option)}
-                    disabled={!!feedback}
-                    className={`group p-6 rounded-xl border-2 transition-all transform font-bold text-lg relative overflow-hidden ${
-                      userAnswer === option
-                        ? option === currentPuzzle.correct
-                          ? 'bg-green-500/30 border-green-400 scale-105 shadow-lg shadow-green-500/50'
-                          : 'bg-red-500/30 border-red-400 scale-95'
-                        : 'bg-slate-800/50 border-purple-400/30 hover:bg-slate-700/50 hover:border-purple-400 hover:scale-105 hover:shadow-xl card-hover'
-                    } ${feedback ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-white/5 group-hover:from-white/5 group-hover:to-white/10 transition-all"></div>
-                    <div className="relative z-10 flex items-center justify-center gap-2">
-                      <span className="text-purple-300 font-black text-sm">{String.fromCharCode(65 + index)}.</span>
-                      <span>{option}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              {/* Feedback */}
-              {feedback && (
-                <div 
-                  className={`p-5 rounded-xl text-center font-bold text-lg border-2 ${
-                    feedback.includes('Correct') ? 'bg-green-500/20 text-green-200 border-green-400/50 shadow-lg shadow-green-500/30' :
-                    feedback.includes('Time') ? 'bg-yellow-500/20 text-yellow-200 border-yellow-400/50' :
-                    'bg-red-500/20 text-red-200 border-red-400/50 shadow-lg shadow-red-500/30'
-                  }`}
-                  style={{ animation: 'slide-up 0.3s ease-out' }}
-                >
-                  {feedback}
-                </div>
-              )}
-            </div>
+          <div style={S.userChip}>
+            <span style={{ color: '#a78bfa' }}>◈</span>
+            <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{user.username}</span>
+            <button onClick={onLogout} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: 13 }}>Logout</button>
           </div>
-        )}
+        </header>
 
-        {gameState === 'results' && (
-          <div className="relative" style={{ animation: 'slide-up 0.6s ease-out' }}>
-            <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-xl rounded-3xl p-10 border border-purple-400/30 shadow-2xl text-center relative overflow-hidden">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
-              
-              <div className="relative z-10">
-                <div className="text-7xl mb-6 animate-bounce">
-                  {stability > 50 ? '🌟' : '⚠️'}
-                </div>
-                <h2 className="text-5xl font-black mb-8 bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-                  {stability > 50 ? 'Dimension Cleared!' : 'Reality Destabilized'}
-                </h2>
-                
-                <div className="grid grid-cols-3 gap-6 mb-10">
-                  <div className="bg-gradient-to-br from-yellow-900/30 to-orange-900/30 rounded-2xl p-6 border-2 border-yellow-400/40">
-                    <Trophy className="w-12 h-12 mx-auto mb-3 text-yellow-400" />
-                    <div className="text-5xl font-black text-yellow-300 mb-2">{score.toLocaleString()}</div>
-                    <div className="text-sm text-yellow-200 font-semibold uppercase tracking-wider">Final Score</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 rounded-2xl p-6 border-2 border-cyan-400/40">
-                    <Zap className="w-12 h-12 mx-auto mb-3 text-cyan-400" />
-                    <div className="text-5xl font-black text-cyan-300 mb-2">{stability}%</div>
-                    <div className="text-sm text-cyan-200 font-semibold uppercase tracking-wider">Stability</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-purple-900/30 to-indigo-900/30 rounded-2xl p-6 border-2 border-purple-400/40">
-                    <Award className="w-12 h-12 mx-auto mb-3 text-purple-400" />
-                    <div className="text-5xl font-black text-purple-300 mb-2">{dimensionLevel}</div>
-                    <div className="text-sm text-purple-200 font-semibold uppercase tracking-wider">Dimension</div>
-                  </div>
-                </div>
-
-                <div className="bg-purple-900/30 rounded-xl p-6 mb-8 border border-purple-400/30">
-                  <p className="text-xl text-purple-100 font-semibold">
-                    {stability > 70 ? '⭐ Exceptional quantum navigation! You\'re a master explorer!' :
-                     stability > 40 ? '👍 Solid performance! Keep refining those probability skills.' :
-                     '💪 Every journey strengthens you. Try again, Explorer!'}
-                  </p>
-                </div>
-
-                <div className="flex gap-4 justify-center">
-                  <button
-                    onClick={startGame}
-                    className="card-hover bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700 px-10 py-4 rounded-xl font-black text-lg transition-all transform shadow-xl border-2 border-cyan-400/50"
-                  >
-                    Continue Exploring →
-                  </button>
-                  <button
-                    onClick={resetGame}
-                    className="card-hover bg-slate-800/50 hover:bg-slate-700/70 px-10 py-4 rounded-xl font-bold text-lg transition-all border border-purple-400/30 hover:border-purple-400"
-                  >
-                    ← Return to Dashboard
-                  </button>
-                </div>
-              </div>
+        <div style={{ display: 'flex', gap: 12, marginBottom: 22, flexWrap: 'wrap' }}>
+          {[
+            { icon: '🏆', label: 'Best Score', val: (user.highestScore || 0).toLocaleString() },
+            { icon: '⚡', label: 'Total Score', val: (user.totalScore || 0).toLocaleString() },
+            { icon: '🎮', label: 'Games Played', val: user.gamesPlayed || 0 },
+          ].map(s => (
+            <div key={s.label} style={S.statCard}>
+              <span style={{ fontSize: 26 }}>{s.icon}</span>
+              <span style={{ color: '#e2e8f0', fontWeight: 700, fontSize: 20 }}>{s.val}</span>
+              <span style={{ color: '#64748b', fontSize: 12 }}>{s.label}</span>
             </div>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
 
-      {/* Footer */}
-      <div className="max-w-6xl mx-auto mt-10 text-center relative z-10">
-        <div className="bg-slate-900/30 backdrop-blur-sm rounded-lg px-6 py-3 inline-block border border-purple-400/20">
-          <p className="text-purple-300 text-sm font-medium">
-            ⚡ Powered by <span className="text-cyan-400 font-bold">Heart Game API</span> • Demonstrating distributed service architecture
+        <div style={S.heroCard}>
+          <h2 style={{ color: '#a78bfa', margin: '0 0 10px', fontSize: 20 }}>What is QuantumQuest?</h2>
+          <p style={{ color: '#cbd5e1', lineHeight: 1.7, margin: 0 }}>
+            Travel through quantum dimensions by solving probability and logical challenges.
+            Maintain your <span style={{ color: '#00ff88', fontWeight: 600 }}>Dimensional Stability</span> —
+            correct answers power it up, wrong answers drain it. When stability hits zero, invoke the{' '}
+            <span style={{ color: '#f472b6', fontWeight: 600 }}>Heart of the Quantum</span> for a second chance!
           </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
+            {['30s per question', 'Difficulty scales each 10 Qs', 'AI-generated questions', '3 Heart Puzzle retries'].map(f => (
+              <span key={f} style={S.featureTag}>▸ {f}</span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+          <button onClick={onStart} style={S.btnStart}>⚛ Begin Quantum Exploration</button>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={onLeaderboard} style={{ ...S.btnSec, flex: 1 }}>🏆 Leaderboard</button>
+            <button onClick={onProfile} style={{ ...S.btnSec, flex: 1 }}>◈ Profile</button>
+          </div>
+        </div>
+
+        <div style={S.infoCard}>
+          <h3 style={{ color: '#a78bfa', margin: '0 0 14px', fontSize: 17 }}>How to Play</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12 }}>
+            {[
+              { n: '01', t: 'Answer Questions', d: 'Solve probability & logic challenges within the time limit' },
+              { n: '02', t: 'Maintain Stability', d: 'Correct answers restore +10%, wrong answers drain -20%' },
+              { n: '03', t: 'Scale Difficulty', d: 'Every 10 questions, timer shortens and difficulty increases' },
+              { n: '04', t: 'Heart Puzzle', d: 'When stability hits 0, solve image puzzles to regain life' },
+            ].map(s => (
+              <div key={s.n} style={{ display: 'flex', gap: 12 }}>
+                <div style={S.stepN}>{s.n}</div>
+                <div>
+                  <div style={{ color: '#e2e8f0', fontWeight: 600, fontSize: 14 }}>{s.t}</div>
+                  <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 3 }}>{s.d}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+// ─── Leaderboard Screen ────────────────────────────────────────────────────────
+
+function LeaderboardScreen({ user, onBack }) {
+  const [board, setBoard] = useState([]);
+  const [userRank, setUserRank] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([api.getLeaderboard(20), api.getUserRank(user.id)])
+      .then(([lb, rank]) => { setBoard(lb); setUserRank(rank); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user.id]);
+
+  const medal = r => r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : `#${r}`;
+
+  return (
+    <div style={S.page}>
+      <Particles />
+      <div style={{ ...S.container, maxWidth: 700, animation: 'fadeIn 0.4s ease' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
+          <button onClick={onBack} style={S.backBtn}>← Back</button>
+          <h2 style={{ color: '#e2e8f0', fontSize: 24, fontWeight: 700, margin: 0 }}>🏆 Quantum Leaderboard</h2>
+        </div>
+
+        {userRank && (
+          <div style={{ ...S.infoCard, display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 18 }}>
+            <span style={{ color: '#a78bfa' }}>Your Rank:</span>
+            <span style={{ color: '#ffd700', fontSize: 22, fontWeight: 700 }}>{medal(userRank.rank)}</span>
+            <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{userRank.username}</span>
+            <span style={{ color: '#00ff88', marginLeft: 'auto' }}>Best: {(userRank.highestScore || 0).toLocaleString()}</span>
+          </div>
+        )}
+
+        {loading ? <div style={{ color: '#64748b', textAlign: 'center', padding: 40 }}>Loading…</div> :
+          board.length === 0 ? <div style={{ color: '#64748b', textAlign: 'center', padding: 40 }}>No players yet — be the first!</div> :
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {board.map(p => (
+              <div key={p.userId} style={{
+                ...S.lbRow,
+                ...(p.userId === user.id ? { background: 'rgba(124,58,237,0.12)', borderColor: 'rgba(124,58,237,0.4)' } : {})
+              }}>
+                <span style={{ color: '#ffd700', fontWeight: 700, minWidth: 36, fontSize: 17 }}>{medal(p.rank)}</span>
+                <span style={{ color: '#e2e8f0', fontWeight: 600, flex: 1 }}>{p.username}</span>
+                <span style={{ color: '#ffd700' }}>Best: {(p.highestScore || 0).toLocaleString()}</span>
+                <span style={{ color: '#64748b', fontSize: 13 }}>Games: {p.gamesPlayed}</span>
+              </div>
+            ))}
+          </div>
+        }
+      </div>
+    </div>
+  );
+}
+
+// ─── Profile Screen ────────────────────────────────────────────────────────────
+
+function ProfileScreen({ user, onBack }) {
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    Promise.all([api.getProfile(), api.getUserRank(user.id)])
+      .then(([p, rank]) => setProfile({ ...p, rank: rank?.rank }))
+      .catch(() => setProfile({ ...user }));
+  }, [user.id]);
+
+  return (
+    <div style={S.page}>
+      <Particles />
+      <div style={{ ...S.container, maxWidth: 600, animation: 'fadeIn 0.4s ease' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
+          <button onClick={onBack} style={S.backBtn}>← Back</button>
+          <h2 style={{ color: '#e2e8f0', fontSize: 24, fontWeight: 700, margin: 0 }}>◈ Explorer Profile</h2>
+        </div>
+
+        {profile && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ ...S.infoCard, display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
+              <div style={S.avatar}>{(profile.username || '?')[0].toUpperCase()}</div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ color: '#e2e8f0', fontSize: 22, margin: '0 0 4px' }}>{profile.username}</h3>
+                <p style={{ color: '#94a3b8', margin: '0 0 4px', fontSize: 14 }}>{profile.email}</p>
+                <p style={{ color: '#a78bfa', margin: 0, fontSize: 13 }}>
+                  Member since {new Date(profile.createdAt || Date.now()).toLocaleDateString()}
+                </p>
+              </div>
+              {profile.rank && (
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 28 }}>🏆</div>
+                  <div style={{ color: '#ffd700', fontWeight: 700 }}>Rank #{profile.rank}</div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Best Score', val: (profile.highestScore || 0).toLocaleString(), color: '#ffd700' },
+                { label: 'Total Score', val: (profile.totalScore || 0).toLocaleString(), color: '#00ff88' },
+                { label: 'Games Played', val: profile.gamesPlayed || 0, color: '#a78bfa' },
+              ].map(s => (
+                <div key={s.label} style={{ ...S.statCard, flex: 1, minWidth: 120 }}>
+                  <span style={{ color: s.color, fontSize: 24, fontWeight: 700 }}>{s.val}</span>
+                  <span style={{ color: '#64748b', fontSize: 12 }}>{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Heart Puzzle Screen ───────────────────────────────────────────────────────
+
+function HeartPuzzleScreen({ retryLeft, onSuccess, onFail }) {
+  const [puzzle, setPuzzle] = useState(null);
+  const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [verifying, setVerifying] = useState(false);
+  const [msg, setMsg] = useState('');
+  const [imgErr, setImgErr] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    api.getHeartPuzzle()
+      .then(p => setPuzzle(p))
+      .catch(() => setMsg('Failed to load puzzle. Network error.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const verify = async () => {
+    if (!answer.trim() || !puzzle) return;
+    setVerifying(true);
+    setMsg('');
+    try {
+      const res = await api.verifyHeartAnswer(puzzle.solution, answer);
+      if (res.correct) { onSuccess(); return; }
+      setMsg('✗ Wrong answer! Try again.');
+      setAnswer('');
+    } catch { setMsg('Verification failed. Please try again.'); }
+    finally { setVerifying(false); }
+  };
+
+  return (
+    <div style={S.page}>
+      <Particles />
+      <div style={{ ...S.container, maxWidth: 560, textAlign: 'center', animation: 'fadeIn 0.4s ease' }}>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 52, marginBottom: 8 }}>💗</div>
+          <h2 style={{ color: '#f472b6', fontSize: 26, margin: '0 0 8px' }}>Quantum Heart Puzzle</h2>
+          <p style={{ color: '#94a3b8', margin: '0 0 16px' }}>Solve this puzzle to restore your dimensional stability</p>
+          <div style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8,
+            background: 'rgba(244,114,182,0.08)', border: '1px solid rgba(244,114,182,0.2)',
+            borderRadius: 30, padding: '8px 18px' }}>
+            {[0,1,2].map(i => <span key={i} style={{ fontSize: 18 }}>{i < retryLeft ? '❤️' : '🖤'}</span>)}
+            <span style={{ color: '#f472b6', fontSize: 13, marginLeft: 6 }}>{retryLeft} attempt{retryLeft !== 1 ? 's' : ''} left</span>
+          </div>
+        </div>
+
+        {loading && <div style={{ color: '#64748b', padding: 40 }}>Fetching quantum puzzle…</div>}
+
+        {puzzle && !loading && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 16, padding: 20, display: 'flex', justifyContent: 'center' }}>
+              {!imgErr ? (
+                <img src={puzzle.imageUrl} alt="Heart Puzzle" onError={() => setImgErr(true)}
+                  style={{ maxWidth: '100%', maxHeight: 280, borderRadius: 10, border: '2px solid rgba(244,114,182,0.3)' }} />
+              ) : (
+                <div style={{ padding: 24, color: '#94a3b8' }}>
+                  <p>Image unavailable — enter the solution number shown in the original puzzle.</p>
+                </div>
+              )}
+            </div>
+
+            <div style={{ width: '100%', maxWidth: 320 }}>
+              <p style={{ color: '#94a3b8', fontSize: 13, marginBottom: 8 }}>Enter the numerical answer:</p>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input type="number" value={answer} onChange={e => setAnswer(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && verify()}
+                  placeholder="0" style={{ ...S.input, flex: 1 }} />
+                <button onClick={verify} disabled={verifying || !answer.trim()} style={S.btnHeart}>
+                  {verifying ? '…' : 'Verify'}
+                </button>
+              </div>
+              {msg && <div style={{ ...S.errBox, marginTop: 10, color: msg.includes('✗') ? '#ff6680' : '#94a3b8' }}>{msg}</div>}
+            </div>
+          </div>
+        )}
+
+        {msg && !puzzle && <div style={S.errBox}>{msg}</div>}
+
+        <button onClick={onFail} style={{ marginTop: 24, background: 'none', border: 'none',
+          color: '#64748b', cursor: 'pointer', fontSize: 13, textDecoration: 'underline' }}>
+          Skip (lose attempt)
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Game Over Screen ──────────────────────────────────────────────────────────
+
+function GameOverScreen({ score, questionsAnswered, correctAnswers, difficultyReached, onMenu, onPlay }) {
+  const acc = questionsAnswered > 0 ? Math.round((correctAnswers / questionsAnswered) * 100) : 0;
+  return (
+    <div style={S.page}>
+      <Particles />
+      <div style={{ ...S.container, maxWidth: 500, textAlign: 'center', animation: 'fadeIn 0.5s ease', paddingTop: 80 }}>
+        <div style={{ fontSize: 72, marginBottom: 12 }}>
+          {score > 1000 ? '⭐' : score > 400 ? '🌟' : '💫'}
+        </div>
+        <h2 style={{ ...S.gradTitle, fontSize: 32, marginBottom: 6 }}>
+          {score > 1000 ? 'Quantum Master!' : score > 400 ? 'Dimension Explored!' : 'Reality Collapsed!'}
+        </h2>
+        <p style={{ color: '#94a3b8', marginBottom: 32 }}>Your quantum journey has ended</p>
+
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 36 }}>
+          {[
+            { label: 'Final Score', val: score.toLocaleString(), color: '#ffd700' },
+            { label: 'Questions', val: questionsAnswered, color: '#00ff88' },
+            { label: 'Accuracy', val: `${acc}%`, color: '#a78bfa' },
+            { label: 'Max Difficulty', val: difficultyReached, color: '#f472b6' },
+          ].map(s => (
+            <div key={s.label} style={{ ...S.statCard, minWidth: 100 }}>
+              <span style={{ color: s.color, fontSize: 24, fontWeight: 700 }}>{s.val}</span>
+              <span style={{ color: '#64748b', fontSize: 12 }}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button onClick={onPlay} style={S.btnStart}>⚛ Play Again</button>
+          <button onClick={onMenu} style={S.btnSec}>↩ Main Menu</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Playing Screen ────────────────────────────────────────────────────────────
+
+function PlayingScreen({ question, questionNumber, score, stability, timer, timeLimit, streak, feedback, onAnswer, onQuit }) {
+  const diff = questionNumber <= 10 ? 'easy' : questionNumber <= 20 ? 'medium' : 'hard';
+  const diffColors = { easy: '#00ff88', medium: '#ffcc00', hard: '#ff4466' };
+  const dc = diffColors[diff];
+
+  return (
+    <div style={S.page}>
+      <Particles />
+      <div style={{ ...S.container, maxWidth: 780, animation: 'fadeIn 0.4s ease' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
+          <div>
+            <h2 style={{ ...S.gradTitle, fontSize: 22, margin: 0 }}>⚛ QuantumQuest</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6 }}>
+              <span style={{ color: '#ffd700', fontWeight: 700 }}>⚡ {score.toLocaleString()}</span>
+              {streak > 1 && (
+                <span style={{ background: 'rgba(255,160,0,0.15)', border: '1px solid rgba(255,160,0,0.3)',
+                  borderRadius: 20, padding: '2px 10px', color: '#ffcc00', fontSize: 13, fontWeight: 600 }}>
+                  🔥 {streak}x Streak
+                </span>
+              )}
+            </div>
+          </div>
+          <button onClick={onQuit} style={{ background: 'rgba(255,68,102,0.1)', border: '1px solid rgba(255,68,102,0.25)',
+            borderRadius: 8, color: '#ff6680', padding: '8px 14px', cursor: 'pointer', fontSize: 14 }}>
+            ✕ Quit
+          </button>
+        </div>
+
+        {/* Status bar */}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap',
+          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 12, padding: '12px 18px', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '2 1 200px' }}>
+            <span style={{ color: '#64748b', fontSize: 12 }}>STABILITY</span>
+            <div style={{ flex: 1 }}><StabilityBar value={stability} /></div>
+            <span style={{ color: stability > 60 ? '#00ff88' : stability > 30 ? '#ffcc00' : '#ff4466', fontWeight: 700, fontSize: 15 }}>
+              {stability}%
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ color: '#64748b', fontSize: 12 }}>Q</span>
+            <span style={{ color: '#a78bfa', fontWeight: 700 }}>{questionNumber}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ color: '#64748b', fontSize: 12 }}>LEVEL</span>
+            <span style={{ color: dc, fontWeight: 700, fontSize: 12, textTransform: 'uppercase' }}>{diff}</span>
+          </div>
+        </div>
+
+        {/* Timer */}
+        <div style={{ position: 'relative', height: 10, background: 'rgba(255,255,255,0.08)',
+          borderRadius: 5, marginBottom: 24, overflow: 'hidden' }}>
+          <div style={{
+            height: '100%', borderRadius: 5,
+            width: `${(timer / timeLimit) * 100}%`,
+            background: timer > 10 ? 'linear-gradient(90deg,#7c3aed,#00ccff)' : 'linear-gradient(90deg,#ff4466,#ff8800)',
+            transition: 'width 1s linear, background 0.3s',
+          }} />
+          <span style={{ position: 'absolute', right: 6, top: -20,
+            color: timer <= 5 ? '#ff4466' : '#94a3b8', fontWeight: 700, fontSize: 17 }}>
+            {timer}s
+          </span>
+        </div>
+
+        {/* Question card */}
+        {question && (
+          <div style={S.qCard}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+              <span style={S.badge}>{question.category || 'probability'}</span>
+              <span style={{ ...S.badge, background: `${dc}18`, color: dc, borderColor: `${dc}44` }}>{diff}</span>
+            </div>
+            <p style={{ color: '#e2e8f0', fontSize: 19, lineHeight: 1.7, marginBottom: 24, fontWeight: 500 }}>
+              🧠 {question.text}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {['A','B','C','D'].map(letter => {
+                const text = question[`option${letter}`];
+                if (!text) return null;
+                return (
+                  <button key={letter} onClick={() => onAnswer(letter)} disabled={!!feedback} style={S.optBtn}>
+                    <span style={S.optLetter}>{letter}</span>
+                    <span style={{ color: '#e2e8f0', textAlign: 'left' }}>{text}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {feedback && (
+              <div style={{
+                marginTop: 18, padding: '14px 18px', borderRadius: 10, fontWeight: 600, fontSize: 15,
+                background: feedback.correct ? 'rgba(0,255,136,0.08)' : 'rgba(255,68,102,0.08)',
+                border: `1px solid ${feedback.correct ? 'rgba(0,255,136,0.3)' : 'rgba(255,68,102,0.3)'}`,
+                color: feedback.correct ? '#00ff88' : '#ff6680',
+              }}>
+                {feedback.correct ? `✓ Correct! +${feedback.points} pts` : '✗ Wrong!'}
+                {!feedback.correct && question.explanation && (
+                  <span style={{ display: 'block', color: '#94a3b8', fontSize: 13, marginTop: 4, fontWeight: 400 }}>
+                    {question.explanation}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Game Controller ──────────────────────────────────────────────────────
+
+export default function QuantumQuest() {
+  const [screen, setScreen] = useState('auth');
+  const [user, setUser] = useState(null);
+
+  const [sessionId, setSessionId] = useState(null);
+  const [poolQuestions, setPoolQuestions] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [questionNumber, setQuestionNumber] = useState(0);
+  const [score, setScore] = useState(0);
+  const [stability, setStability] = useState(100);
+  const [timer, setTimer] = useState(30);
+  const [timeLimit, setTimeLimit] = useState(30);
+  const [streak, setStreak] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [retryChances, setRetryChances] = useState(3);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [wrongAnswers, setWrongAnswers] = useState(0);
+  const [difficultyReached, setDifficultyReached] = useState('easy');
+
+  const timerRef = useRef(null);
+  const answeredRef = useRef(false);
+  const poolRef = useRef([]);
+  const qNumRef = useRef(0);
+
+  // Auth
+  const handleAuth = useCallback((userData) => {
+    setUser(userData);
+    setScreen('menu');
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    api.setToken(null);
+    setUser(null);
+    setScreen('auth');
+  }, []);
+
+  // Timer helpers
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+  }, []);
+
+  const startTimer = useCallback((limit) => {
+    stopTimer();
+    setTimer(limit);
+    timerRef.current = setInterval(() => {
+      setTimer(t => {
+        if (t <= 1) { clearInterval(timerRef.current); timerRef.current = null; return 0; }
+        return t - 1;
+      });
+    }, 1000);
+  }, [stopTimer]);
+
+  // Time-up handler
+  useEffect(() => {
+    if (timer === 0 && screen === 'playing' && !answeredRef.current && currentQuestion) {
+      handleAnswer('TIMEOUT');
+    }
+  }, [timer]);
+
+  useEffect(() => () => stopTimer(), []);
+
+  // Game start
+  const startGame = useCallback(async () => {
+    stopTimer();
+    answeredRef.current = false;
+    setScore(0);
+    setStability(100);
+    setStreak(0);
+    setQuestionNumber(0);
+    setCorrectAnswers(0);
+    setWrongAnswers(0);
+    setRetryChances(3);
+    setDifficultyReached('easy');
+    setFeedback(null);
+    setCurrentQuestion(null);
+    qNumRef.current = 0;
+
+    let pool = [];
+    let sid = null;
+    try {
+      const [sess, qs] = await Promise.all([api.startSession(), api.getPoolQuestions()]);
+      sid = sess.sessionId;
+      pool = qs;
+    } catch {/* run offline */}
+
+    setSessionId(sid);
+    setPoolQuestions(pool);
+    poolRef.current = pool;
+
+    setScreen('playing');
+    loadQuestion(pool, 0);
+  }, [stopTimer]);
+
+  const getDiff = (n) => n < 10 ? 'easy' : n < 20 ? 'medium' : 'hard';
+  const getLimit = (n) => Math.max(10, 30 - Math.floor(n / 10) * 5);
+
+  const getFallback = (diff, n) => {
+    const qs = [
+      { id:`f${n}`, text:`[Q${n}] A fair coin is flipped. P(heads)?`, optionA:'1/4', optionB:'1/2', optionC:'3/4', optionD:'1', correctAnswer:'B', explanation:'A fair coin: P = 1/2' },
+      { id:`f${n}`, text:`[Q${n}] Two dice rolled. P(sum=7)?`, optionA:'1/12', optionB:'7/36', optionC:'1/6', optionD:'1/4', correctAnswer:'C', explanation:'6 ways to get 7 out of 36 = 1/6' },
+      { id:`f${n}`, text:`[Q${n}] Sequence: 1,4,9,16,?`, optionA:'20', optionB:'25', optionC:'36', optionD:'18', correctAnswer:'B', explanation:'n²: 5²=25' },
+      { id:`f${n}`, text:`[Q${n}] P(A)=0.5, P(B)=0.4, independent. P(A∩B)?`, optionA:'0.2', optionB:'0.9', optionC:'0.45', optionD:'0.3', correctAnswer:'A', explanation:'P(A)×P(B)=0.5×0.4=0.2' },
+    ];
+    return { ...qs[n % qs.length], category: 'probability', difficulty: diff };
+  };
+
+  const loadQuestion = useCallback(async (pool, prevNum) => {
+    const newNum = prevNum + 1;
+    const diff = getDiff(newNum - 1);
+    const limit = getLimit(newNum - 1);
+
+    qNumRef.current = newNum;
+    setQuestionNumber(newNum);
+    setTimeLimit(limit);
+    setDifficultyReached(diff);
+    setFeedback(null);
+    answeredRef.current = false;
+
+    let q;
+    if (newNum <= 10 && pool.length >= newNum) {
+      q = pool[newNum - 1];
+    } else {
+      try { q = await api.generateQuestion(diff, newNum); }
+      catch { q = getFallback(diff, newNum); }
+    }
+
+    setCurrentQuestion(q);
+    startTimer(limit);
+  }, [startTimer]);
+
+  const handleAnswer = useCallback(async (selected) => {
+    if (answeredRef.current) return;
+    answeredRef.current = true;
+    stopTimer();
+
+    const isTimeout = selected === 'TIMEOUT';
+    const q = currentQuestion;
+    const isCorrect = !isTimeout && selected === q?.correctAnswer;
+    const curStreak = streak;
+    const curScore = score;
+    const curStab = stability;
+
+    const pts = isCorrect ? Math.round((100 + timer * 5) * (1 + Math.min(curStreak, 10) * 0.1)) : 0;
+    const newStreak = isCorrect ? curStreak + 1 : 0;
+    const newStab = isCorrect ? Math.min(100, curStab + 10) : Math.max(0, curStab - (isTimeout ? 15 : 20));
+    const newScore = curScore + pts;
+
+    setStreak(newStreak);
+    setScore(newScore);
+    setStability(newStab);
+    if (isCorrect) setCorrectAnswers(c => c + 1);
+    else setWrongAnswers(w => w + 1);
+    setFeedback({ correct: isCorrect, points: pts });
+
+    if (sessionId && q) {
+      api.submitAnswer(sessionId, q.id, isTimeout ? 'TIMEOUT' : selected, q.correctAnswer, timer, qNumRef.current, curStreak).catch(() => {});
+    }
+
+    if (newStab <= 0) {
+      setTimeout(() => {
+        setRetryChances(r => {
+          if (r > 0) { setScreen('heart'); return r; }
+          endGame(newScore, 0);
+          return 0;
+        });
+      }, 1200);
+    } else {
+      setTimeout(() => {
+        loadQuestion(poolRef.current, qNumRef.current);
+      }, 1600);
+    }
+  }, [currentQuestion, streak, score, stability, timer, sessionId, stopTimer, loadQuestion]);
+
+  const endGame = useCallback((finalScore, finalStab) => {
+    stopTimer();
+    setScreen('gameover');
+    if (sessionId) {
+      api.endSession(sessionId, finalScore, finalStab, qNumRef.current, correctAnswers, wrongAnswers, difficultyReached).catch(() => {});
+    }
+    setUser(u => ({
+      ...u,
+      highestScore: Math.max(u?.highestScore || 0, finalScore),
+      totalScore: (u?.totalScore || 0) + finalScore,
+      gamesPlayed: (u?.gamesPlayed || 0) + 1,
+    }));
+  }, [sessionId, correctAnswers, wrongAnswers, difficultyReached, stopTimer]);
+
+  // Heart puzzle
+  const handleHeartSuccess = useCallback(() => {
+    setStability(50);
+    setRetryChances(r => r - 1);
+    setScreen('playing');
+    loadQuestion(poolRef.current, qNumRef.current);
+  }, [loadQuestion]);
+
+  const handleHeartFail = useCallback(() => {
+    setRetryChances(r => {
+      const next = r - 1;
+      if (next <= 0) endGame(score, 0);
+      return next;
+    });
+  }, [score, endGame]);
+
+  // Render
+  if (screen === 'auth') return <AuthScreen onAuth={handleAuth} />;
+
+  if (screen === 'menu') return (
+    <MenuScreen user={user} onStart={startGame}
+      onLeaderboard={() => setScreen('leaderboard')}
+      onProfile={() => setScreen('profile')}
+      onLogout={handleLogout} />
+  );
+
+  if (screen === 'leaderboard') return <LeaderboardScreen user={user} onBack={() => setScreen('menu')} />;
+  if (screen === 'profile') return <ProfileScreen user={user} onBack={() => setScreen('menu')} />;
+
+  if (screen === 'heart') return (
+    <HeartPuzzleScreen retryLeft={retryChances} onSuccess={handleHeartSuccess} onFail={handleHeartFail} />
+  );
+
+  if (screen === 'gameover') return (
+    <GameOverScreen
+      score={score} questionsAnswered={questionNumber}
+      correctAnswers={correctAnswers} difficultyReached={difficultyReached}
+      onMenu={() => setScreen('menu')} onPlay={startGame}
+    />
+  );
+
+  if (screen === 'playing') return (
+    <PlayingScreen
+      question={currentQuestion} questionNumber={questionNumber}
+      score={score} stability={stability}
+      timer={timer} timeLimit={timeLimit}
+      streak={streak} feedback={feedback}
+      onAnswer={handleAnswer}
+      onQuit={() => endGame(score, stability)}
+    />
+  );
+
+  return null;
+}
+
+// ─── Style constants ───────────────────────────────────────────────────────────
+
+const S = {
+  page: {
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg,#080818 0%,#0d0825 50%,#080818 100%)',
+    position: 'relative', overflowX: 'hidden',
+    display: 'flex', justifyContent: 'center',
+    fontFamily: "'Inter','Segoe UI',sans-serif",
+  },
+  container: {
+    width: '100%', padding: '36px 20px', position: 'relative', zIndex: 1,
+    boxSizing: 'border-box',
+  },
+  authCard: {
+    background: 'rgba(12,8,32,0.96)',
+    border: '1px solid rgba(124,58,237,0.3)',
+    borderRadius: 20, padding: '40px 32px',
+    width: '100%', maxWidth: 420, height: 'fit-content',
+    margin: 'auto',
+    boxShadow: '0 0 60px rgba(124,58,237,0.12)',
+    position: 'relative', zIndex: 1,
+    boxSizing: 'border-box',
+  },
+  gradTitle: {
+    background: 'linear-gradient(90deg,#a78bfa,#00ccff)',
+    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+    fontSize: 28, fontWeight: 800, margin: '0 0 4px',
+  },
+  sub: { color: '#475569', fontSize: 11, letterSpacing: 3, margin: 0 },
+  tabRow: {
+    display: 'flex', marginBottom: 20,
+    background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 4,
+  },
+  tab: {
+    flex: 1, padding: '10px 0', borderRadius: 8, border: 'none',
+    cursor: 'pointer', background: 'transparent', color: '#64748b', fontWeight: 600, transition: 'all 0.2s',
+  },
+  tabOn: { background: 'rgba(124,58,237,0.25)', color: '#a78bfa' },
+  input: {
+    width: '100%', padding: '12px 15px', boxSizing: 'border-box',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(124,58,237,0.3)',
+    borderRadius: 10, color: '#e2e8f0', fontSize: 15, fontFamily: 'inherit',
+  },
+  errBox: {
+    background: 'rgba(255,68,102,0.08)', border: '1px solid rgba(255,68,102,0.25)',
+    borderRadius: 8, padding: '10px 14px', color: '#ff6680', fontSize: 14,
+  },
+  btnPrimary: {
+    width: '100%', padding: '14px', marginTop: 4,
+    background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    border: 'none', borderRadius: 10, color: '#fff',
+    fontSize: 15, fontWeight: 700, cursor: 'pointer',
+  },
+  linkBtn: {
+    background: 'none', border: 'none', color: '#a78bfa',
+    cursor: 'pointer', fontWeight: 600, fontSize: 14, padding: 0,
+  },
+  userChip: {
+    display: 'flex', alignItems: 'center', gap: 10,
+    background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)',
+    borderRadius: 12, padding: '8px 14px',
+  },
+  statCard: {
+    flex: 1, minWidth: 100,
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 14, padding: '16px', display: 'flex', flexDirection: 'column',
+    alignItems: 'center', gap: 6,
+  },
+  heroCard: {
+    background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.2)',
+    borderRadius: 16, padding: '22px', marginBottom: 22,
+  },
+  featureTag: {
+    color: '#94a3b8', fontSize: 13, padding: '5px 11px',
+    background: 'rgba(255,255,255,0.04)', borderRadius: 8,
+  },
+  btnStart: {
+    padding: '15px 28px', background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    border: 'none', borderRadius: 12, color: '#fff', fontSize: 16,
+    fontWeight: 700, cursor: 'pointer', boxShadow: '0 0 28px rgba(124,58,237,0.35)',
+  },
+  btnSec: {
+    padding: '13px 20px', background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12,
+    color: '#e2e8f0', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+  },
+  infoCard: {
+    background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: 16, padding: '20px',
+  },
+  stepN: {
+    width: 34, height: 34, borderRadius: 8, flexShrink: 0,
+    background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: '#a78bfa', fontWeight: 700, fontSize: 12,
+  },
+  backBtn: {
+    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 8, color: '#94a3b8', padding: '8px 14px', cursor: 'pointer', fontSize: 14,
+  },
+  lbRow: {
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: 12, padding: '13px 18px',
+    display: 'flex', alignItems: 'center', gap: 14,
+  },
+  avatar: {
+    width: 68, height: 68, borderRadius: '50%',
+    background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: '#fff', fontSize: 28, fontWeight: 700, flexShrink: 0,
+  },
+  btnHeart: {
+    padding: '12px 18px', background: 'linear-gradient(135deg,#db2777,#f472b6)',
+    border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700, cursor: 'pointer',
+  },
+  qCard: {
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,58,237,0.2)',
+    borderRadius: 20, padding: '26px', boxShadow: '0 0 40px rgba(124,58,237,0.06)',
+  },
+  badge: {
+    background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)',
+    borderRadius: 20, padding: '4px 12px', color: '#a78bfa',
+    fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1,
+  },
+  optBtn: {
+    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 12, padding: '15px 16px', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', gap: 12,
+    transition: 'background 0.15s, border-color 0.15s',
+    textAlign: 'left',
+  },
+  optLetter: {
+    width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+    background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.3)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: '#a78bfa', fontWeight: 700, fontSize: 14,
+  },
+};
