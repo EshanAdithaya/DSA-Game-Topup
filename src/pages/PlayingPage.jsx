@@ -109,6 +109,12 @@ export default function PlayingPage() {
             <span style={{ ...S.badge, background: `${dc}18`, color: dc, borderColor: `${dc}44` }}>
               {diff}
             </span>
+            {currentQuestion._source === 'ai' && (
+              <span style={styles.aiBadge}>🤖 AI Generated</span>
+            )}
+            {currentQuestion._source === 'pool' && (
+              <span style={styles.poolBadge}>📚 Pool Question</span>
+            )}
           </div>
 
           {/* Question text */}
@@ -136,7 +142,7 @@ export default function PlayingPage() {
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.background = '#ffffff';
                     e.currentTarget.style.borderColor = COLORS.border;
                   }}
                 >
@@ -208,11 +214,12 @@ const styles = {
     gap: 12,
     alignItems: 'center',
     flexWrap: 'wrap',
-    background: 'rgba(255,255,255,0.04)',
+    background: '#ffffff',
     border: `1px solid ${COLORS.border}`,
     borderRadius: 12,
     padding: '12px 18px',
     marginBottom: 14,
+    boxShadow: COLORS.shadow,
   },
   stabilityGroup: {
     display: 'flex',
@@ -240,7 +247,7 @@ const styles = {
   timerWrap: {
     position: 'relative',
     height: 10,
-    background: 'rgba(255,255,255,0.08)',
+    background: 'rgba(0,0,0,0.07)',
     borderRadius: 5,
     marginBottom: 28,
     overflow: 'hidden',
@@ -282,5 +289,23 @@ const styles = {
     fontSize: 13,
     marginTop: 4,
     fontWeight: 400,
+  },
+  aiBadge: {
+    background: COLORS.aiBg,
+    border: `1px solid ${COLORS.aiBorder}`,
+    borderRadius: 20,
+    padding: '3px 10px',
+    color: COLORS.ai,
+    fontSize: 12,
+    fontWeight: 600,
+  },
+  poolBadge: {
+    background: 'rgba(16,185,129,0.1)',
+    border: '1px solid rgba(16,185,129,0.3)',
+    borderRadius: 20,
+    padding: '3px 10px',
+    color: COLORS.green,
+    fontSize: 12,
+    fontWeight: 600,
   },
 };

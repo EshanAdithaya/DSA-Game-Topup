@@ -140,14 +140,15 @@ export default function ProfilePage() {
 
 const styles = {
   heroCard: {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: '#ffffff',
+    border: `1px solid ${COLORS.border}`,
     borderRadius: 18,
     padding: '24px',
     display: 'flex',
     alignItems: 'center',
     gap: 20,
     flexWrap: 'wrap',
+    boxShadow: COLORS.shadow,
   },
   username: {
     color: COLORS.text,
@@ -185,14 +186,15 @@ const styles = {
   statCard: {
     flex: 1,
     minWidth: 130,
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: '#ffffff',
+    border: `1px solid ${COLORS.border}`,
     borderRadius: 14,
     padding: '20px 16px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     gap: 8,
+    boxShadow: COLORS.shadow,
   },
   sectionTitle: {
     color: COLORS.purpleLight,
@@ -206,7 +208,8 @@ const styles = {
     gap: 12,
   },
   achievementBadge: {
-    background: 'rgba(255,255,255,0.04)',
+    background: 'rgba(0,0,0,0.04)',
+    border: `1px solid ${COLORS.border}`,
     borderRadius: 12,
     padding: '14px 8px',
     display: 'flex',

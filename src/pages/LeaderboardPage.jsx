@@ -197,7 +197,7 @@ const styles = {
     display: 'flex',
     gap: 0,
     marginBottom: 16,
-    background: 'rgba(255,255,255,0.04)',
+    background: 'rgba(0,0,0,0.05)',
     borderRadius: 10,
     padding: 4,
   },
@@ -215,8 +215,8 @@ const styles = {
     fontFamily: 'inherit',
   },
   tabActive: {
-    background: 'rgba(124,58,237,0.25)',
-    color: COLORS.purpleLight,
+    background: COLORS.purpleFaint,
+    color: COLORS.purple,
   },
   loading: {
     textAlign: 'center',
