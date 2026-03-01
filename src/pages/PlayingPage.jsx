@@ -13,6 +13,7 @@ export default function PlayingPage() {
   const {
     currentQuestion, questionNumber, score, stability,
     timer, timeLimit, streak, feedback, endGame, processAnswer,
+    difficultyReached, correctAnswers,
   } = useGame();
 
   // If someone navigates directly to /play with no question loaded, redirect
@@ -24,7 +25,7 @@ export default function PlayingPage() {
 
   if (!currentQuestion) return null;
 
-  const diff  = questionNumber <= 10 ? 'easy' : questionNumber <= 20 ? 'medium' : 'hard';
+  const diff  = difficultyReached;   // driven by correctAnswers, not total questions
   const dc    = DIFF_COLORS[diff];
   const timerPct = (timer / timeLimit) * 100;
 
@@ -76,6 +77,22 @@ export default function PlayingPage() {
                 {diff}
               </span>
             </div>
+            {/* Correct-answers → next level progress */}
+            {diff !== 'hard' && (
+              <div style={styles.metaChip}>
+                <span style={styles.statusLabel}>NEXT LVL</span>
+                <span style={{ color: COLORS.cyan, fontWeight: 700, fontSize: 12 }}>
+                  {correctAnswers % 10}/10 ✓
+                </span>
+              </div>
+            )}
+            {diff === 'hard' && (
+              <div style={styles.metaChip}>
+                <span style={{ color: COLORS.yellow, fontWeight: 700, fontSize: 11 }}>
+                  MAX LEVEL 👑
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

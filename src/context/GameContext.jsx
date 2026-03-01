@@ -6,8 +6,8 @@ const GameContext = createContext(null);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const getDifficulty = (n) => (n < 10 ? 'easy' : n < 20 ? 'medium' : 'hard');
-const getTimeLimit  = (n) => Math.max(10, 30 - Math.floor(n / 10) * 5);
+const getDifficulty = (correctCount) => (correctCount < 10 ? 'easy' : correctCount < 20 ? 'medium' : 'hard');
+const getTimeLimit  = (correctCount) => Math.max(10, 30 - Math.floor(correctCount / 10) * 5);
 
 const FALLBACK_QUESTIONS = [
   { id:'f1', text:'A fair coin is flipped. What is P(heads)?', optionA:'1/4', optionB:'1/2', optionC:'3/4', optionD:'1', correctAnswer:'B', category:'probability', explanation:'A fair coin: P(heads) = 1/2' },
@@ -135,8 +135,9 @@ export function GameProvider({ children }) {
 
   const loadQuestion = useCallback(async (pool, prevQNum) => {
     const newNum  = prevQNum + 1;
-    const diff    = getDifficulty(newNum - 1);
-    const limit   = getTimeLimit(newNum - 1);
+    // Difficulty and timer are driven by how many questions were answered CORRECTLY
+    const diff    = getDifficulty(correctRef.current);
+    const limit   = getTimeLimit(correctRef.current);
 
     qNumRef.current = newNum;
     setQuestionNumber(newNum);
