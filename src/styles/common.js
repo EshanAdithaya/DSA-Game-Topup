@@ -340,6 +340,15 @@ export const globalCss = `
     70%  { transform: scale(1.05); }
     100% { transform: scale(1);    opacity: 1; }
   }
+  @keyframes guideIn {
+    0%   { transform: scale(0.8) translateY(10px); opacity: 0; }
+    60%  { transform: scale(1.03) translateY(-2px); opacity: 1; }
+    100% { transform: scale(1) translateY(0);       opacity: 1; }
+  }
+  @keyframes blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95%           { transform: scaleY(0.1); }
+  }
   * { box-sizing: border-box; }
   body { margin: 0; background: #f5f4ff; }
   input:focus {
