@@ -45,7 +45,7 @@ export default function MenuPage() {
           <h2 style={{ color: COLORS.purpleLight, margin: '0 0 10px', fontSize: 20 }}>
             What is QuantumQuest?
           </h2>
-          <p style={{ color: '#cbd5e1', lineHeight: 1.7, margin: 0 }}>
+          <p style={{ color: COLORS.textMuted, lineHeight: 1.7, margin: 0 }}>
             Travel through quantum dimensions by solving probability and logical challenges.
             Maintain your{' '}
             <span style={{ color: COLORS.green, fontWeight: 600 }}>Dimensional Stability</span>{' '}

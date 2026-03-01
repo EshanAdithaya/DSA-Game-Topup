@@ -148,10 +148,14 @@ export function GameProvider({ children }) {
 
     let q;
     if (newNum <= 10 && pool.length >= newNum) {
-      q = pool[newNum - 1];
+      q = { ...pool[newNum - 1], _source: 'pool' };
     } else {
-      try { q = await api.generateQuestion(diff, newNum); }
-      catch { q = getFallback(diff, newNum); }
+      try {
+        const aiQ = await api.generateQuestion(diff, newNum);
+        q = { ...aiQ, _source: 'ai' };
+      } catch {
+        q = { ...getFallback(diff, newNum), _source: 'fallback' };
+      }
     }
 
     setCurrentQuestion(q);

@@ -210,11 +210,11 @@ const styles = {
   },
   puzzleCard: {
     width: '100%',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(244,114,182,0.15)',
+    background: '#ffffff',
+    border: '1px solid rgba(244,114,182,0.2)',
     borderRadius: 20,
     padding: '28px 24px',
-    boxShadow: '0 0 40px rgba(244,114,182,0.06)',
+    boxShadow: '0 4px 24px rgba(244,114,182,0.08)',
     minHeight: 200,
     display: 'flex',
     alignItems: 'center',
@@ -235,7 +235,7 @@ const styles = {
     animation: 'spin 0.8s linear infinite',
   },
   imageFrame: {
-    background: 'rgba(0,0,0,0.2)',
+    background: 'rgba(0,0,0,0.04)',
     borderRadius: 12,
     padding: 12,
     border: '1px solid rgba(244,114,182,0.2)',

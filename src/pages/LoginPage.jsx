@@ -132,12 +132,11 @@ const styles = {
   },
   card: {
     width: '100%',
-    background: 'rgba(12,8,32,0.96)',
-    border: '1px solid rgba(124,58,237,0.3)',
+    background: '#ffffff',
+    border: '1.5px solid rgba(124,58,237,0.15)',
     borderRadius: 20,
     padding: '36px 32px',
-    boxShadow: '0 0 60px rgba(124,58,237,0.12), inset 0 1px 0 rgba(255,255,255,0.05)',
-    backdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 40px rgba(124,58,237,0.1)',
   },
   cardTitle: {
     color: COLORS.text,
@@ -170,14 +169,14 @@ const styles = {
     width: '100%',
     padding: '14px',
     marginTop: 4,
-    background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    background: 'linear-gradient(135deg,#7c3aed,#06b6d4)',
     border: 'none',
     borderRadius: 10,
     color: '#fff',
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
-    transition: 'opacity 0.2s',
+    boxShadow: '0 4px 14px rgba(124,58,237,0.3)',
     fontFamily: 'inherit',
   },
   spinner: {
@@ -193,7 +192,7 @@ const styles = {
   dividerLine: {
     flex: 1,
     height: 1,
-    background: 'rgba(255,255,255,0.08)',
+    background: 'rgba(0,0,0,0.08)',
   },
   dividerText: {
     color: COLORS.textFaint,

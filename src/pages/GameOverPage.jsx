@@ -158,14 +158,15 @@ const styles = {
   statCard: {
     flex: '1 1 90px',
     minWidth: 90,
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.07)',
+    background: '#ffffff',
+    border: `1px solid ${COLORS.border}`,
     borderRadius: 14,
     padding: '16px 10px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     gap: 6,
+    boxShadow: COLORS.shadow,
   },
   actions: {
     display: 'flex',
