@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Particles from '../components/Particles';
 import StabilityBar from '../components/StabilityBar';
+import GuideCharacter from '../components/GuideCharacter';
 import { useGame } from '../context/GameContext';
 import { S, COLORS } from '../styles/common';
 
@@ -158,8 +159,8 @@ export default function PlayingPage() {
             <div
               style={{
                 ...styles.feedbackBox,
-                background: feedback.correct ? 'rgba(0,255,136,0.08)' : 'rgba(255,68,102,0.08)',
-                border:     `1px solid ${feedback.correct ? 'rgba(0,255,136,0.3)' : 'rgba(255,68,102,0.3)'}`,
+                background: feedback.correct ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
+                border:     `1px solid ${feedback.correct ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
                 color:      feedback.correct ? COLORS.green : COLORS.red,
               }}
             >
@@ -172,6 +173,15 @@ export default function PlayingPage() {
             </div>
           )}
         </div>
+
+        {/* ── Qubitron guide ── */}
+        <GuideCharacter
+          feedback={feedback}
+          streak={streak}
+          stability={stability}
+          timer={timer}
+          questionNumber={questionNumber}
+        />
       </div>
     </div>
   );
