@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Particles from '../components/Particles';
 import { useGame } from '../context/GameContext';
 import { api } from '../services/api';
 import { S, COLORS } from '../styles/common';
@@ -35,8 +34,6 @@ export default function LeaderboardPage() {
 
   return (
     <div style={S.page}>
-      <Particles />
-
       <div style={{ ...S.container, maxWidth: 700, animation: 'fadeIn 0.4s ease' }}>
         {/* ── Header ── */}
         <div style={S.pageHeader}>
@@ -112,7 +109,7 @@ function TopPlayers({ board, userId }) {
           style={{
             ...S.lbRow,
             ...(p.userId === userId
-              ? { background: 'rgba(124,58,237,0.1)', borderColor: 'rgba(124,58,237,0.35)' }
+              ? { background: '#eff6ff', borderColor: 'rgba(37,99,235,0.3)' }
               : {}),
           }}
         >
@@ -164,8 +161,8 @@ function RecentGames({ recent }) {
 
 const styles = {
   myRankCard: {
-    background: 'rgba(124,58,237,0.08)',
-    border: '1px solid rgba(124,58,237,0.3)',
+    background: '#eff6ff',
+    border: '1px solid rgba(37,99,235,0.2)',
     borderRadius: 14,
     padding: '16px 20px',
     display: 'flex',
@@ -235,7 +232,7 @@ const styles = {
     minWidth: 36,
   },
   youBadge: {
-    background: 'rgba(124,58,237,0.2)',
+    background: 'rgba(37,99,235,0.12)',
     color: COLORS.purpleLight,
     fontSize: 11,
     borderRadius: 4,

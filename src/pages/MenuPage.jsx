@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import Particles from '../components/Particles';
 import { useGame } from '../context/GameContext';
 import { S, COLORS } from '../styles/common';
 
@@ -9,8 +8,6 @@ export default function MenuPage() {
 
   return (
     <div style={S.page}>
-      <Particles />
-
       <div style={{ ...S.container, maxWidth: 820, animation: 'fadeIn 0.5s ease' }}>
         {/* ── Header ── */}
         <header style={styles.header}>
@@ -145,14 +142,14 @@ const styles = {
   },
   startBtn: {
     padding: '16px 28px',
-    background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    background: '#2563eb',
     border: 'none',
     borderRadius: 12,
     color: '#fff',
     fontSize: 17,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 0 30px rgba(124,58,237,0.35)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
     fontFamily: 'inherit',
   },
   secondaryRow: {

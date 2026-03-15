@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import Particles from '../components/Particles';
 import { useGame } from '../context/GameContext';
 import { api } from '../services/api';
 import { S, COLORS } from '../styles/common';
@@ -31,8 +30,6 @@ export default function LoginPage() {
 
   return (
     <div style={S.page}>
-      <Particles />
-
       <div style={styles.wrapper}>
         {/* Logo */}
         <div style={styles.logoBlock}>
@@ -128,15 +125,14 @@ const styles = {
   },
   logoIcon: {
     fontSize: 56,
-    filter: 'drop-shadow(0 0 16px #7c3aed88)',
   },
   card: {
     width: '100%',
     background: '#ffffff',
-    border: '1.5px solid rgba(124,58,237,0.15)',
+    border: '1.5px solid rgba(0,0,0,0.1)',
     borderRadius: 20,
     padding: '36px 32px',
-    boxShadow: '0 8px 40px rgba(124,58,237,0.1)',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
   },
   cardTitle: {
     color: COLORS.text,
@@ -169,14 +165,14 @@ const styles = {
     width: '100%',
     padding: '14px',
     marginTop: 4,
-    background: 'linear-gradient(135deg,#7c3aed,#06b6d4)',
+    background: '#2563eb',
     border: 'none',
     borderRadius: 10,
     color: '#fff',
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 4px 14px rgba(124,58,237,0.3)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
     fontFamily: 'inherit',
   },
   spinner: {

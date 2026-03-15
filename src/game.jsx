@@ -21,45 +21,6 @@ function StabilityBar({ value }) {
   );
 }
 
-function Particles() {
-  const particles = Array.from({ length: 18 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 3 + 1,
-    duration: Math.random() * 8 + 4,
-    delay: Math.random() * 4,
-  }));
-  return (
-    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          style={{
-            position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
-            width: p.size, height: p.size, borderRadius: '50%',
-            background: i => i % 2 === 0 ? '#7c3aed' : '#00ccff',
-            opacity: 0.35,
-            animation: `floatUp ${p.duration}s ${p.delay}s ease-in-out infinite alternate`,
-          }}
-        />
-      ))}
-      <style>{`
-        @keyframes floatUp {
-          0% { transform: translateY(0) scale(1); opacity: 0.2; }
-          100% { transform: translateY(-40px) scale(1.4); opacity: 0.5; }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(16px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        button:hover { opacity: 0.92; }
-        input:focus { border-color: rgba(124,58,237,0.6) !important; outline: none !important; }
-      `}</style>
-    </div>
-  );
-}
-
 // ─── Auth Screen ───────────────────────────────────────────────────────────────
 
 function AuthScreen({ onAuth }) {
@@ -93,7 +54,6 @@ function AuthScreen({ onAuth }) {
 
   return (
     <div style={S.page}>
-      <Particles />
       <div style={S.authCard}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{ fontSize: 52 }}>⚛</div>
@@ -140,7 +100,6 @@ function AuthScreen({ onAuth }) {
 function MenuScreen({ user, onStart, onLeaderboard, onProfile, onLogout }) {
   return (
     <div style={S.page}>
-      <Particles />
       <div style={{ ...S.container, maxWidth: 820, animation: 'fadeIn 0.5s ease' }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 14 }}>
           <div>
@@ -148,7 +107,7 @@ function MenuScreen({ user, onStart, onLeaderboard, onProfile, onLogout }) {
             <p style={S.sub}>THE PROBABILITY PARADOX</p>
           </div>
           <div style={S.userChip}>
-            <span style={{ color: '#a78bfa' }}>◈</span>
+            <span style={{ color: '#60a5fa' }}>◈</span>
             <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{user.username}</span>
             <button onClick={onLogout} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: 13 }}>Logout</button>
           </div>
@@ -169,7 +128,7 @@ function MenuScreen({ user, onStart, onLeaderboard, onProfile, onLogout }) {
         </div>
 
         <div style={S.heroCard}>
-          <h2 style={{ color: '#a78bfa', margin: '0 0 10px', fontSize: 20 }}>What is QuantumQuest?</h2>
+          <h2 style={{ color: '#60a5fa', margin: '0 0 10px', fontSize: 20 }}>What is QuantumQuest?</h2>
           <p style={{ color: '#cbd5e1', lineHeight: 1.7, margin: 0 }}>
             Travel through quantum dimensions by solving probability and logical challenges.
             Maintain your <span style={{ color: '#00ff88', fontWeight: 600 }}>Dimensional Stability</span> —
@@ -192,7 +151,7 @@ function MenuScreen({ user, onStart, onLeaderboard, onProfile, onLogout }) {
         </div>
 
         <div style={S.infoCard}>
-          <h3 style={{ color: '#a78bfa', margin: '0 0 14px', fontSize: 17 }}>How to Play</h3>
+          <h3 style={{ color: '#60a5fa', margin: '0 0 14px', fontSize: 17 }}>How to Play</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12 }}>
             {[
               { n: '01', t: 'Answer Questions', d: 'Solve probability & logic challenges within the time limit' },
@@ -233,7 +192,6 @@ function LeaderboardScreen({ user, onBack }) {
 
   return (
     <div style={S.page}>
-      <Particles />
       <div style={{ ...S.container, maxWidth: 700, animation: 'fadeIn 0.4s ease' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
           <button onClick={onBack} style={S.backBtn}>← Back</button>
@@ -242,7 +200,7 @@ function LeaderboardScreen({ user, onBack }) {
 
         {userRank && (
           <div style={{ ...S.infoCard, display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 18 }}>
-            <span style={{ color: '#a78bfa' }}>Your Rank:</span>
+            <span style={{ color: '#60a5fa' }}>Your Rank:</span>
             <span style={{ color: '#ffd700', fontSize: 22, fontWeight: 700 }}>{medal(userRank.rank)}</span>
             <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{userRank.username}</span>
             <span style={{ color: '#00ff88', marginLeft: 'auto' }}>Best: {(userRank.highestScore || 0).toLocaleString()}</span>
@@ -255,7 +213,7 @@ function LeaderboardScreen({ user, onBack }) {
             {board.map(p => (
               <div key={p.userId} style={{
                 ...S.lbRow,
-                ...(p.userId === user.id ? { background: 'rgba(124,58,237,0.12)', borderColor: 'rgba(124,58,237,0.4)' } : {})
+                ...(p.userId === user.id ? { background: 'rgba(37,99,235,0.12)', borderColor: 'rgba(37,99,235,0.4)' } : {})
               }}>
                 <span style={{ color: '#ffd700', fontWeight: 700, minWidth: 36, fontSize: 17 }}>{medal(p.rank)}</span>
                 <span style={{ color: '#e2e8f0', fontWeight: 600, flex: 1 }}>{p.username}</span>
@@ -283,7 +241,6 @@ function ProfileScreen({ user, onBack }) {
 
   return (
     <div style={S.page}>
-      <Particles />
       <div style={{ ...S.container, maxWidth: 600, animation: 'fadeIn 0.4s ease' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
           <button onClick={onBack} style={S.backBtn}>← Back</button>
@@ -297,7 +254,7 @@ function ProfileScreen({ user, onBack }) {
               <div style={{ flex: 1 }}>
                 <h3 style={{ color: '#e2e8f0', fontSize: 22, margin: '0 0 4px' }}>{profile.username}</h3>
                 <p style={{ color: '#94a3b8', margin: '0 0 4px', fontSize: 14 }}>{profile.email}</p>
-                <p style={{ color: '#a78bfa', margin: 0, fontSize: 13 }}>
+                <p style={{ color: '#60a5fa', margin: 0, fontSize: 13 }}>
                   Member since {new Date(profile.createdAt || Date.now()).toLocaleDateString()}
                 </p>
               </div>
@@ -313,7 +270,7 @@ function ProfileScreen({ user, onBack }) {
               {[
                 { label: 'Best Score', val: (profile.highestScore || 0).toLocaleString(), color: '#ffd700' },
                 { label: 'Total Score', val: (profile.totalScore || 0).toLocaleString(), color: '#00ff88' },
-                { label: 'Games Played', val: profile.gamesPlayed || 0, color: '#a78bfa' },
+                { label: 'Games Played', val: profile.gamesPlayed || 0, color: '#60a5fa' },
               ].map(s => (
                 <div key={s.label} style={{ ...S.statCard, flex: 1, minWidth: 120 }}>
                   <span style={{ color: s.color, fontSize: 24, fontWeight: 700 }}>{s.val}</span>
@@ -361,7 +318,6 @@ function HeartPuzzleScreen({ retryLeft, onSuccess, onFail }) {
 
   return (
     <div style={S.page}>
-      <Particles />
       <div style={{ ...S.container, maxWidth: 560, textAlign: 'center', animation: 'fadeIn 0.4s ease' }}>
         <div style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 52, marginBottom: 8 }}>💗</div>
@@ -423,7 +379,6 @@ function GameOverScreen({ score, questionsAnswered, correctAnswers, difficultyRe
   const acc = questionsAnswered > 0 ? Math.round((correctAnswers / questionsAnswered) * 100) : 0;
   return (
     <div style={S.page}>
-      <Particles />
       <div style={{ ...S.container, maxWidth: 500, textAlign: 'center', animation: 'fadeIn 0.5s ease', paddingTop: 80 }}>
         <div style={{ fontSize: 72, marginBottom: 12 }}>
           {score > 1000 ? '⭐' : score > 400 ? '🌟' : '💫'}
@@ -437,7 +392,7 @@ function GameOverScreen({ score, questionsAnswered, correctAnswers, difficultyRe
           {[
             { label: 'Final Score', val: score.toLocaleString(), color: '#ffd700' },
             { label: 'Questions', val: questionsAnswered, color: '#00ff88' },
-            { label: 'Accuracy', val: `${acc}%`, color: '#a78bfa' },
+            { label: 'Accuracy', val: `${acc}%`, color: '#60a5fa' },
             { label: 'Max Difficulty', val: difficultyReached, color: '#f472b6' },
           ].map(s => (
             <div key={s.label} style={{ ...S.statCard, minWidth: 100 }}>
@@ -465,7 +420,6 @@ function PlayingScreen({ question, questionNumber, score, stability, timer, time
 
   return (
     <div style={S.page}>
-      <Particles />
       <div style={{ ...S.container, maxWidth: 780, animation: 'fadeIn 0.4s ease' }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
@@ -500,7 +454,7 @@ function PlayingScreen({ question, questionNumber, score, stability, timer, time
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ color: '#64748b', fontSize: 12 }}>Q</span>
-            <span style={{ color: '#a78bfa', fontWeight: 700 }}>{questionNumber}</span>
+            <span style={{ color: '#60a5fa', fontWeight: 700 }}>{questionNumber}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ color: '#64748b', fontSize: 12 }}>LEVEL</span>
@@ -514,7 +468,7 @@ function PlayingScreen({ question, questionNumber, score, stability, timer, time
           <div style={{
             height: '100%', borderRadius: 5,
             width: `${(timer / timeLimit) * 100}%`,
-            background: timer > 10 ? 'linear-gradient(90deg,#7c3aed,#00ccff)' : 'linear-gradient(90deg,#ff4466,#ff8800)',
+            background: timer > 10 ? '#2563eb' : '#dc2626',
             transition: 'width 1s linear, background 0.3s',
           }} />
           <span style={{ position: 'absolute', right: 6, top: -20,
@@ -818,7 +772,7 @@ export default function QuantumQuest() {
 const S = {
   page: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg,#080818 0%,#0d0825 50%,#080818 100%)',
+    background: '#1e293b',
     position: 'relative', overflowX: 'hidden',
     display: 'flex', justifyContent: 'center',
     fontFamily: "'Inter','Segoe UI',sans-serif",
@@ -828,73 +782,72 @@ const S = {
     boxSizing: 'border-box',
   },
   authCard: {
-    background: 'rgba(12,8,32,0.96)',
-    border: '1px solid rgba(124,58,237,0.3)',
+    background: '#0f172a',
+    border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 20, padding: '40px 32px',
     width: '100%', maxWidth: 420, height: 'fit-content',
     margin: 'auto',
-    boxShadow: '0 0 60px rgba(124,58,237,0.12)',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
     position: 'relative', zIndex: 1,
     boxSizing: 'border-box',
   },
   gradTitle: {
-    background: 'linear-gradient(90deg,#a78bfa,#00ccff)',
-    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+    color: '#60a5fa',
     fontSize: 28, fontWeight: 800, margin: '0 0 4px',
   },
-  sub: { color: '#475569', fontSize: 11, letterSpacing: 3, margin: 0 },
+  sub: { color: '#64748b', fontSize: 11, letterSpacing: 3, margin: 0 },
   tabRow: {
     display: 'flex', marginBottom: 20,
-    background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 4,
+    background: 'rgba(255,255,255,0.05)', borderRadius: 10, padding: 4,
   },
   tab: {
     flex: 1, padding: '10px 0', borderRadius: 8, border: 'none',
     cursor: 'pointer', background: 'transparent', color: '#64748b', fontWeight: 600, transition: 'all 0.2s',
   },
-  tabOn: { background: 'rgba(124,58,237,0.25)', color: '#a78bfa' },
+  tabOn: { background: 'rgba(37,99,235,0.2)', color: '#60a5fa' },
   input: {
     width: '100%', padding: '12px 15px', boxSizing: 'border-box',
     background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(124,58,237,0.3)',
+    border: '1px solid rgba(255,255,255,0.15)',
     borderRadius: 10, color: '#e2e8f0', fontSize: 15, fontFamily: 'inherit',
   },
   errBox: {
-    background: 'rgba(255,68,102,0.08)', border: '1px solid rgba(255,68,102,0.25)',
-    borderRadius: 8, padding: '10px 14px', color: '#ff6680', fontSize: 14,
+    background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)',
+    borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: 14,
   },
   btnPrimary: {
     width: '100%', padding: '14px', marginTop: 4,
-    background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    background: '#2563eb',
     border: 'none', borderRadius: 10, color: '#fff',
     fontSize: 15, fontWeight: 700, cursor: 'pointer',
   },
   linkBtn: {
-    background: 'none', border: 'none', color: '#a78bfa',
+    background: 'none', border: 'none', color: '#60a5fa',
     cursor: 'pointer', fontWeight: 600, fontSize: 14, padding: 0,
   },
   userChip: {
     display: 'flex', alignItems: 'center', gap: 10,
-    background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)',
+    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 12, padding: '8px 14px',
   },
   statCard: {
     flex: 1, minWidth: 100,
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 14, padding: '16px', display: 'flex', flexDirection: 'column',
     alignItems: 'center', gap: 6,
   },
   heroCard: {
-    background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.2)',
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 16, padding: '22px', marginBottom: 22,
   },
   featureTag: {
     color: '#94a3b8', fontSize: 13, padding: '5px 11px',
-    background: 'rgba(255,255,255,0.04)', borderRadius: 8,
+    background: 'rgba(255,255,255,0.05)', borderRadius: 8,
   },
   btnStart: {
-    padding: '15px 28px', background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    padding: '15px 28px', background: '#2563eb',
     border: 'none', borderRadius: 12, color: '#fff', fontSize: 16,
-    fontWeight: 700, cursor: 'pointer', boxShadow: '0 0 28px rgba(124,58,237,0.35)',
+    fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
   },
   btnSec: {
     padding: '13px 20px', background: 'rgba(255,255,255,0.06)',
@@ -902,41 +855,41 @@ const S = {
     color: '#e2e8f0', fontSize: 14, fontWeight: 600, cursor: 'pointer',
   },
   infoCard: {
-    background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)',
+    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
     borderRadius: 16, padding: '20px',
   },
   stepN: {
     width: 34, height: 34, borderRadius: 8, flexShrink: 0,
-    background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)',
+    background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: '#a78bfa', fontWeight: 700, fontSize: 12,
+    color: '#60a5fa', fontWeight: 700, fontSize: 12,
   },
   backBtn: {
     background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 8, color: '#94a3b8', padding: '8px 14px', cursor: 'pointer', fontSize: 14,
   },
   lbRow: {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
     borderRadius: 12, padding: '13px 18px',
     display: 'flex', alignItems: 'center', gap: 14,
   },
   avatar: {
     width: 68, height: 68, borderRadius: '50%',
-    background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    background: '#2563eb',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     color: '#fff', fontSize: 28, fontWeight: 700, flexShrink: 0,
   },
   btnHeart: {
-    padding: '12px 18px', background: 'linear-gradient(135deg,#db2777,#f472b6)',
+    padding: '12px 18px', background: '#db2777',
     border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700, cursor: 'pointer',
   },
   qCard: {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,58,237,0.2)',
-    borderRadius: 20, padding: '26px', boxShadow: '0 0 40px rgba(124,58,237,0.06)',
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 20, padding: '26px', boxShadow: '0 2px 12px rgba(0,0,0,0.2)',
   },
   badge: {
-    background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)',
-    borderRadius: 20, padding: '4px 12px', color: '#a78bfa',
+    background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)',
+    borderRadius: 20, padding: '4px 12px', color: '#60a5fa',
     fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1,
   },
   optBtn: {
@@ -948,8 +901,8 @@ const S = {
   },
   optLetter: {
     width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-    background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.3)',
+    background: 'rgba(37,99,235,0.2)', border: '1px solid rgba(37,99,235,0.3)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: '#a78bfa', fontWeight: 700, fontSize: 14,
+    color: '#60a5fa', fontWeight: 700, fontSize: 14,
   },
 };

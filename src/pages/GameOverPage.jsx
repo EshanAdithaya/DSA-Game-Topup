@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import Particles from '../components/Particles';
 import { useGame } from '../context/GameContext';
 import { S, COLORS } from '../styles/common';
 
@@ -12,8 +11,6 @@ export default function GameOverPage() {
 
   return (
     <div style={S.page}>
-      <Particles />
-
       {/* Ambient glow */}
       <div style={styles.glow} />
 
@@ -81,18 +78,7 @@ function getPerformanceRank(score, accuracy) {
 }
 
 const styles = {
-  glow: {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%,-50%)',
-    width: 800,
-    height: 800,
-    borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(124,58,237,0.07), transparent 70%)',
-    pointerEvents: 'none',
-    zIndex: 0,
-  },
+  glow: { display: 'none' },
   wrapper: {
     width: '100%',
     maxWidth: 560,
@@ -108,7 +94,6 @@ const styles = {
   },
   icon: {
     fontSize: 72,
-    filter: 'drop-shadow(0 0 20px rgba(124,58,237,0.4))',
     animation: 'fadeIn 0.6s ease',
   },
   sub: {
@@ -117,8 +102,8 @@ const styles = {
     margin: 0,
   },
   scoreHighlight: {
-    background: 'rgba(124,58,237,0.08)',
-    border: '1px solid rgba(124,58,237,0.25)',
+    background: '#eff6ff',
+    border: '1px solid rgba(37,99,235,0.2)',
     borderRadius: 18,
     padding: '22px 40px',
     display: 'flex',
@@ -126,7 +111,7 @@ const styles = {
     alignItems: 'center',
     gap: 6,
     width: '100%',
-    boxShadow: '0 0 40px rgba(124,58,237,0.08)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
   },
   scoreLabel: {
     color: COLORS.textFaint,
@@ -136,9 +121,7 @@ const styles = {
     textTransform: 'uppercase',
   },
   scoreValue: {
-    background: `linear-gradient(90deg,${COLORS.purpleLight},${COLORS.cyan})`,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
+    color: COLORS.purple,
     fontSize: 52,
     fontWeight: 800,
     lineHeight: 1,
@@ -177,14 +160,14 @@ const styles = {
   },
   playAgainBtn: {
     padding: '15px',
-    background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    background: '#2563eb',
     border: 'none',
     borderRadius: 12,
     color: '#fff',
     fontSize: 16,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 0 28px rgba(124,58,237,0.35)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
     fontFamily: 'inherit',
   },
 };

@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Particles from '../components/Particles';
 import StabilityBar from '../components/StabilityBar';
 import GuideCharacter from '../components/GuideCharacter';
 import { useGame } from '../context/GameContext';
@@ -31,8 +30,6 @@ export default function PlayingPage() {
 
   return (
     <div style={S.page}>
-      <Particles />
-
       <div style={{ ...S.container, maxWidth: 780, animation: 'fadeIn 0.3s ease' }}>
 
         {/* ── Top bar ── */}
@@ -104,8 +101,8 @@ export default function PlayingPage() {
               width: `${timerPct}%`,
               background:
                 timer > 10
-                  ? 'linear-gradient(90deg,#7c3aed,#00ccff)'
-                  : 'linear-gradient(90deg,#ff4466,#ff8800)',
+                  ? '#2563eb'
+                  : '#dc2626',
             }}
           />
           <span
@@ -155,8 +152,8 @@ export default function PlayingPage() {
                   }}
                   onMouseEnter={(e) => {
                     if (!feedback) {
-                      e.currentTarget.style.background = 'rgba(124,58,237,0.12)';
-                      e.currentTarget.style.borderColor = 'rgba(124,58,237,0.4)';
+                      e.currentTarget.style.background = '#eff6ff';
+                      e.currentTarget.style.borderColor = 'rgba(37,99,235,0.4)';
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -227,10 +224,10 @@ const styles = {
     fontWeight: 600,
   },
   quitBtn: {
-    background: 'rgba(255,68,102,0.1)',
-    border: '1px solid rgba(255,68,102,0.25)',
+    background: '#fef2f2',
+    border: '1px solid #fecaca',
     borderRadius: 8,
-    color: '#ff6680',
+    color: '#dc2626',
     padding: '8px 14px',
     cursor: 'pointer',
     fontSize: 14,

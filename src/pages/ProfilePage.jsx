@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Particles from '../components/Particles';
 import { useGame } from '../context/GameContext';
 import { api } from '../services/api';
 import { S, COLORS } from '../styles/common';
@@ -28,8 +27,6 @@ export default function ProfilePage() {
 
   return (
     <div style={S.page}>
-      <Particles />
-
       <div style={{ ...S.container, maxWidth: 640, animation: 'fadeIn 0.4s ease' }}>
         {/* ── Header ── */}
         <div style={S.pageHeader}>

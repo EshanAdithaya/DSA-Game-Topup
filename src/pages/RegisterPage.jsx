@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import Particles from '../components/Particles';
 import { useGame } from '../context/GameContext';
 import { api } from '../services/api';
 import { S, COLORS } from '../styles/common';
@@ -40,8 +39,6 @@ export default function RegisterPage() {
 
   return (
     <div style={S.page}>
-      <Particles />
-
       <div style={styles.wrapper}>
         {/* Logo */}
         <div style={styles.logoBlock}>
@@ -152,7 +149,7 @@ function PasswordStrength({ password }) {
     { label: 'Number', ok: /\d/.test(password) },
   ];
   const score = checks.filter((c) => c.ok).length;
-  const colors = ['#ff4466', '#ffcc00', '#00ff88'];
+  const colors = ['#dc2626', '#ca8a04', '#16a34a'];
   const labels = ['Weak', 'Fair', 'Strong'];
 
   return (
@@ -212,15 +209,14 @@ const styles = {
   },
   logoIcon: {
     fontSize: 52,
-    filter: 'drop-shadow(0 0 16px #7c3aed88)',
   },
   card: {
     width: '100%',
     background: '#ffffff',
-    border: '1.5px solid rgba(124,58,237,0.15)',
+    border: '1.5px solid rgba(0,0,0,0.1)',
     borderRadius: 20,
     padding: '34px 30px',
-    boxShadow: '0 8px 40px rgba(124,58,237,0.1)',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
   },
   cardTitle: {
     color: COLORS.text,
@@ -253,7 +249,7 @@ const styles = {
     width: '100%',
     padding: '14px',
     marginTop: 4,
-    background: 'linear-gradient(135deg,#7c3aed,#0099ff)',
+    background: '#2563eb',
     border: 'none',
     borderRadius: 10,
     color: '#fff',

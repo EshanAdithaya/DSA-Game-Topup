@@ -1,12 +1,12 @@
-// ─── Design Tokens — White/Black Theme with vivid game accents ─────────────────
+// ─── Design Tokens — Clean Blue/White Theme ────────────────────────────────────
 
 export const COLORS = {
   // ── Backgrounds ──
-  bg:        '#f5f4ff',
-  bgGrad:    'linear-gradient(135deg, #ffffff 0%, #f3f0ff 50%, #eef5ff 100%)',
+  bg:        '#f3f4f6',
+  bgGrad:    '#f3f4f6',
   cardBg:    '#ffffff',
-  cardBg2:   '#faf9ff',
-  sectionBg: '#f0eeff',
+  cardBg2:   '#f9fafb',
+  sectionBg: '#e5e7eb',
 
   // ── Text ──
   text:      '#111827',
@@ -14,42 +14,42 @@ export const COLORS = {
   textFaint: '#9ca3af',
 
   // ── Borders & Shadows ──
-  border:   'rgba(0,0,0,0.08)',
+  border:   'rgba(0,0,0,0.1)',
   shadow:   '0 2px 12px rgba(0,0,0,0.07)',
   shadowMd: '0 4px 24px rgba(0,0,0,0.09)',
   shadowLg: '0 8px 40px rgba(0,0,0,0.12)',
 
-  // ── Brand purple ──
-  purple:       '#7c3aed',
-  purpleLight:  '#8b5cf6',
-  purpleDark:   '#5b21b6',
-  purpleFaint:  '#ede9fe',
-  purpleBorder: 'rgba(124,58,237,0.18)',
-  purpleBg:     'rgba(124,58,237,0.06)',
+  // ── Brand blue (replaces purple) ──
+  purple:       '#2563eb',
+  purpleLight:  '#3b82f6',
+  purpleDark:   '#1d4ed8',
+  purpleFaint:  '#eff6ff',
+  purpleBorder: 'rgba(37,99,235,0.2)',
+  purpleBg:     'rgba(37,99,235,0.05)',
 
-  // ── Vivid game accent colors (kept vivid for in-game elements) ──
-  cyan:     '#06b6d4',
-  cyanNeon: '#00ccff',
+  // ── Game accent colors ──
+  cyan:     '#0891b2',
+  cyanNeon: '#0891b2',
 
-  green:     '#10b981',
-  greenNeon: '#00ff88',
+  green:     '#16a34a',
+  greenNeon: '#16a34a',
 
-  yellow:     '#f59e0b',
-  yellowNeon: '#ffd700',
+  yellow:     '#ca8a04',
+  yellowNeon: '#ca8a04',
 
-  pink:     '#ec4899',
-  pinkNeon: '#f472b6',
+  pink:     '#db2777',
+  pinkNeon: '#db2777',
 
-  red:     '#ef4444',
-  redNeon: '#ff4466',
+  red:     '#dc2626',
+  redNeon: '#dc2626',
 
-  orange:     '#f97316',
-  orangeNeon: '#ff8800',
+  orange:     '#ea580c',
+  orangeNeon: '#ea580c',
 
-  // AI badge
-  ai:    '#7c3aed',
-  aiBg:  '#f5f3ff',
-  aiBorder: 'rgba(124,58,237,0.25)',
+  // badge
+  ai:    '#2563eb',
+  aiBg:  '#eff6ff',
+  aiBorder: 'rgba(37,99,235,0.2)',
 };
 
 // ─── Shared style object ───────────────────────────────────────────────────────
@@ -74,9 +74,7 @@ export const S = {
   },
 
   gradTitle: {
-    background: `linear-gradient(90deg,${COLORS.purple},${COLORS.cyan})`,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
+    color: COLORS.purple,
     fontWeight: 800,
     margin: '0 0 4px',
   },
@@ -119,26 +117,26 @@ export const S = {
   btnPrimary: {
     width: '100%',
     padding: '14px',
-    background: `linear-gradient(135deg,${COLORS.purple},${COLORS.cyan})`,
+    background: COLORS.purple,
     border: 'none',
     borderRadius: 10,
     color: '#fff',
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 4px 14px rgba(124,58,237,0.3)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
     fontFamily: 'inherit',
   },
   btnStart: {
     padding: '15px 28px',
-    background: `linear-gradient(135deg,${COLORS.purple},${COLORS.cyan})`,
+    background: COLORS.purple,
     border: 'none',
     borderRadius: 12,
     color: '#fff',
     fontSize: 16,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 4px 20px rgba(124,58,237,0.3)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
     fontFamily: 'inherit',
   },
   btnSecondary: {
@@ -249,7 +247,7 @@ export const S = {
     width: 68,
     height: 68,
     borderRadius: '50%',
-    background: `linear-gradient(135deg,${COLORS.purple},${COLORS.cyan})`,
+    background: COLORS.purple,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -257,7 +255,7 @@ export const S = {
     fontSize: 28,
     fontWeight: 700,
     flexShrink: 0,
-    boxShadow: '0 4px 16px rgba(124,58,237,0.25)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
   },
 
   qCard: {
@@ -350,10 +348,10 @@ export const globalCss = `
     95%           { transform: scaleY(0.1); }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: #f5f4ff; }
+  body { margin: 0; background: #f3f4f6; }
   input:focus {
-    border-color: rgba(124,58,237,0.5) !important;
-    box-shadow: 0 0 0 3px rgba(124,58,237,0.1) !important;
+    border-color: rgba(37,99,235,0.5) !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
   }
   button { font-family: inherit; }
 `;

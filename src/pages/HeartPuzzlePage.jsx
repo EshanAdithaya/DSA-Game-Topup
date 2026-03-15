@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import Particles from '../components/Particles';
 import { useGame } from '../context/GameContext';
 import { api } from '../services/api';
 import { S, COLORS } from '../styles/common';
@@ -46,15 +45,11 @@ export default function HeartPuzzlePage() {
 
   return (
     <div style={S.page}>
-      <Particles />
-
-      {/* Pink ambient glow */}
-      <div style={styles.glow} />
 
       <div style={styles.wrapper}>
         {/* ── Header ── */}
         <div style={styles.header}>
-          <div style={{ fontSize: 56, filter: 'drop-shadow(0 0 20px #f472b688)' }}>💗</div>
+          <div style={{ fontSize: 56 }}>💗</div>
           <h2 style={styles.title}>Quantum Heart Puzzle</h2>
           <p style={styles.subtitle}>
             Solve this image puzzle to restore your dimensional stability
@@ -156,18 +151,7 @@ export default function HeartPuzzlePage() {
 }
 
 const styles = {
-  glow: {
-    position: 'fixed',
-    top: '40%',
-    left: '50%',
-    transform: 'translate(-50%,-50%)',
-    width: 700,
-    height: 700,
-    borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(244,114,182,0.07), transparent 70%)',
-    pointerEvents: 'none',
-    zIndex: 0,
-  },
+  glow: { display: 'none' },
   wrapper: {
     width: '100%',
     maxWidth: 580,
@@ -202,8 +186,8 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 6,
-    background: 'rgba(244,114,182,0.08)',
-    border: '1px solid rgba(244,114,182,0.2)',
+    background: '#f9fafb',
+    border: '1px solid rgba(0,0,0,0.1)',
     borderRadius: 30,
     padding: '8px 20px',
     marginTop: 6,
@@ -211,10 +195,10 @@ const styles = {
   puzzleCard: {
     width: '100%',
     background: '#ffffff',
-    border: '1px solid rgba(244,114,182,0.2)',
+    border: '1px solid rgba(0,0,0,0.1)',
     borderRadius: 20,
     padding: '28px 24px',
-    boxShadow: '0 4px 24px rgba(244,114,182,0.08)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
     minHeight: 200,
     display: 'flex',
     alignItems: 'center',
@@ -230,15 +214,15 @@ const styles = {
     width: 40,
     height: 40,
     borderRadius: '50%',
-    border: '3px solid rgba(244,114,182,0.15)',
-    borderTopColor: COLORS.pink,
+    border: '3px solid rgba(0,0,0,0.08)',
+    borderTopColor: COLORS.purple,
     animation: 'spin 0.8s linear infinite',
   },
   imageFrame: {
     background: 'rgba(0,0,0,0.04)',
     borderRadius: 12,
     padding: 12,
-    border: '1px solid rgba(244,114,182,0.2)',
+    border: '1px solid rgba(0,0,0,0.1)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -272,7 +256,7 @@ const styles = {
   },
   verifyBtn: {
     padding: '13px 18px',
-    background: 'linear-gradient(135deg,#db2777,#f472b6)',
+    background: '#2563eb',
     border: 'none',
     borderRadius: 10,
     color: '#fff',
