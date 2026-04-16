@@ -162,7 +162,7 @@ function PasswordStrength({ password }) {
               flex: 1,
               height: 4,
               borderRadius: 2,
-              background: i < score ? colors[score - 1] : 'rgba(0,0,0,0.08)',
+              background: i < score ? colors[score - 1] : 'rgba(255,255,255,0.10)',
               transition: 'background 0.3s',
             }}
           />
@@ -212,17 +212,20 @@ const styles = {
   },
   card: {
     width: '100%',
-    background: '#ffffff',
-    border: '1.5px solid rgba(0,0,0,0.1)',
-    borderRadius: 20,
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: 22,
     padding: '34px 30px',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+    boxShadow: '0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)',
   },
   cardTitle: {
     color: COLORS.text,
     fontSize: 24,
     fontWeight: 700,
     margin: '0 0 4px',
+    fontFamily: "'Space Grotesk','Inter',system-ui,sans-serif",
   },
   cardSub: {
     color: COLORS.textFaint,
@@ -249,14 +252,16 @@ const styles = {
     width: '100%',
     padding: '14px',
     marginTop: 4,
-    background: '#2563eb',
+    background: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
     border: 'none',
-    borderRadius: 10,
+    borderRadius: 12,
     color: '#fff',
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
+    boxShadow: '0 4px 22px rgba(99,102,241,0.55)',
     fontFamily: 'inherit',
+    transition: 'transform 0.15s, box-shadow 0.15s',
   },
   divider: {
     display: 'flex',
@@ -267,7 +272,7 @@ const styles = {
   dividerLine: {
     flex: 1,
     height: 1,
-    background: 'rgba(0,0,0,0.08)',
+    background: 'rgba(255,255,255,0.10)',
   },
   dividerText: {
     color: COLORS.textFaint,

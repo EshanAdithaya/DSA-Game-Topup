@@ -101,8 +101,12 @@ export default function PlayingPage() {
               width: `${timerPct}%`,
               background:
                 timer > 10
-                  ? '#2563eb'
-                  : '#dc2626',
+                  ? 'linear-gradient(90deg, #6366f1, #818cf8)'
+                  : 'linear-gradient(90deg, #dc2626, #ef4444)',
+              boxShadow:
+                timer > 10
+                  ? '0 0 12px rgba(129,140,248,0.6)'
+                  : '0 0 12px rgba(239,68,68,0.7)',
             }}
           />
           <span
@@ -152,13 +156,17 @@ export default function PlayingPage() {
                   }}
                   onMouseEnter={(e) => {
                     if (!feedback) {
-                      e.currentTarget.style.background = '#eff6ff';
-                      e.currentTarget.style.borderColor = 'rgba(37,99,235,0.4)';
+                      e.currentTarget.style.background = 'rgba(129,140,248,0.14)';
+                      e.currentTarget.style.borderColor = 'rgba(129,140,248,0.50)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 20px rgba(129,140,248,0.20)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#ffffff';
-                    e.currentTarget.style.borderColor = COLORS.border;
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
                   <span style={S.optLetter}>{letter}</span>
@@ -173,9 +181,10 @@ export default function PlayingPage() {
             <div
               style={{
                 ...styles.feedbackBox,
-                background: feedback.correct ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
-                border:     `1px solid ${feedback.correct ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
-                color:      feedback.correct ? COLORS.green : COLORS.red,
+                background: feedback.correct ? 'rgba(16,185,129,0.14)' : 'rgba(239,68,68,0.14)',
+                border:     `1px solid ${feedback.correct ? 'rgba(16,185,129,0.40)' : 'rgba(239,68,68,0.40)'}`,
+                color:      feedback.correct ? COLORS.greenNeon : COLORS.redNeon,
+                boxShadow:  feedback.correct ? '0 0 20px rgba(16,185,129,0.12)' : '0 0 20px rgba(239,68,68,0.12)',
               }}
             >
               {feedback.correct
@@ -224,26 +233,31 @@ const styles = {
     fontWeight: 600,
   },
   quitBtn: {
-    background: '#fef2f2',
-    border: '1px solid #fecaca',
-    borderRadius: 8,
-    color: '#dc2626',
+    background: 'rgba(239,68,68,0.12)',
+    border: '1px solid rgba(239,68,68,0.32)',
+    borderRadius: 10,
+    color: '#f87171',
     padding: '8px 14px',
     cursor: 'pointer',
     fontSize: 14,
     fontFamily: 'inherit',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    transition: 'background 0.15s',
   },
   statusRow: {
     display: 'flex',
     gap: 12,
     alignItems: 'center',
     flexWrap: 'wrap',
-    background: '#ffffff',
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: 12,
+    background: 'rgba(255,255,255,0.06)',
+    border: `1px solid rgba(255,255,255,0.10)`,
+    borderRadius: 14,
     padding: '12px 18px',
     marginBottom: 14,
-    boxShadow: COLORS.shadow,
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
   },
   stabilityGroup: {
     display: 'flex',
@@ -271,10 +285,11 @@ const styles = {
   timerWrap: {
     position: 'relative',
     height: 10,
-    background: 'rgba(0,0,0,0.07)',
+    background: 'rgba(255,255,255,0.08)',
     borderRadius: 5,
     marginBottom: 28,
     overflow: 'hidden',
+    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)',
   },
   timerFill: {
     height: '100%',

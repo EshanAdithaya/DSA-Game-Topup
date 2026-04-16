@@ -73,11 +73,11 @@ function pick(arr) {
 // ── Mood themes ─────────────────────────────────────────────────────────────────
 
 const MOOD = {
-  idle:    { face: '🤖', color: COLORS.purpleLight, bg: '#ffffff', border: COLORS.purpleBorder },
-  correct: { face: '🤩', color: COLORS.green,       bg: 'rgba(16,185,129,0.06)',  border: 'rgba(16,185,129,0.28)' },
-  wrong:   { face: '😬', color: COLORS.red,          bg: 'rgba(239,68,68,0.06)',   border: 'rgba(239,68,68,0.25)'  },
-  panic:   { face: '😱', color: COLORS.orange,       bg: 'rgba(249,115,22,0.06)', border: 'rgba(249,115,22,0.28)' },
-  streak:  { face: '🔥', color: '#f59e0b',            bg: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.28)' },
+  idle:    { face: '🤖', color: '#a5b4fc', bg: 'rgba(129,140,248,0.12)', border: 'rgba(129,140,248,0.32)' },
+  correct: { face: '🤩', color: '#34d399', bg: 'rgba(16,185,129,0.14)',  border: 'rgba(16,185,129,0.38)'  },
+  wrong:   { face: '😬', color: '#f87171', bg: 'rgba(239,68,68,0.14)',   border: 'rgba(239,68,68,0.38)'   },
+  panic:   { face: '😱', color: '#fb923c', bg: 'rgba(249,115,22,0.14)',  border: 'rgba(249,115,22,0.38)'  },
+  streak:  { face: '🔥', color: '#fbbf24', bg: 'rgba(245,158,11,0.14)', border: 'rgba(245,158,11,0.38)'  },
 };
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -169,12 +169,12 @@ export default function GuideCharacter({ feedback, streak, stability, timer, que
             border: `1.5px solid ${m.border}`,
             borderRadius: 22,
             padding: '14px 16px',
-            boxShadow: `0 6px 28px rgba(0,0,0,0.12), 0 0 0 1px ${m.border}`,
+            boxShadow: `0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px ${m.border}`,
             position: 'relative',
             marginBottom: 4,
             animation: 'guideIn 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             // Extra "cloud puffs" using outline trick
           }}
         >
@@ -197,7 +197,7 @@ export default function GuideCharacter({ feedback, streak, stability, timer, que
 
           <p style={{
             margin: 0,
-            color: COLORS.text,
+            color: '#e2e8f0',
             fontSize: 12.5,
             lineHeight: 1.6,
             fontStyle: 'italic',
@@ -221,16 +221,18 @@ export default function GuideCharacter({ feedback, streak, stability, timer, que
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
         <div
           style={{
-            width: 56,
-            height: 56,
+            width: 58,
+            height: 58,
             borderRadius: 18,
-            background: '#ffffff',
-            border: `2.5px solid ${m.color}66`,
+            background: 'rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: `2px solid ${m.color}77`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: 30,
-            boxShadow: `0 4px 16px ${m.color}33, 0 0 0 4px ${m.color}11`,
+            boxShadow: `0 6px 24px ${m.color}44, 0 0 0 4px ${m.color}18`,
             animation: mood === 'panic'  ? 'pulse 0.4s infinite' :
                        mood === 'streak' ? 'pulse 0.7s infinite' : 'none',
             cursor: 'default',

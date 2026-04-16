@@ -1,68 +1,151 @@
+/* ─── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --font-body:    'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-heading: 'Space Grotesk', 'Inter', system-ui, sans-serif;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* ─── Base ───────────────────────────────────────────────────────────────────── */
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  min-height: 100vh;
+  background: #070b18;
+  color: #f1f5f9;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Animated nebula / space background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%,  rgba(99,102,241,0.22)  0%, transparent 55%),
+    radial-gradient(ellipse 60% 70% at 85% 85%,  rgba(6,182,212,0.14)   0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 50% 50%,  rgba(139,92,246,0.07)  0%, transparent 65%),
+    radial-gradient(ellipse 35% 35% at 90% 15%,  rgba(236,72,153,0.10)  0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: nebulaShift 18s ease-in-out infinite alternate;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* ─── Custom scrollbar ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar            { width: 6px; height: 6px; }
+::-webkit-scrollbar-track      { background: rgba(255,255,255,0.03); }
+::-webkit-scrollbar-thumb      { background: rgba(129,140,248,0.35); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover{ background: rgba(129,140,248,0.60); }
+
+/* ─── Selections / links ─────────────────────────────────────────────────────── */
+::selection { background: rgba(129,140,248,0.35); color: #fff; }
+
+a              { color: #818cf8; text-decoration: none; }
+a:hover        { color: #a5b4fc; }
+button         { font-family: var(--font-body); cursor: pointer; }
+
+/* ─── Input focus ────────────────────────────────────────────────────────────── */
+input:focus {
+  border-color: rgba(129,140,248,0.65) !important;
+  box-shadow:   0 0 0 3px rgba(129,140,248,0.18) !important;
+  outline: none;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Input placeholder */
+input::placeholder { color: #475569; }
+
+/* ─── Keyframe animations ────────────────────────────────────────────────────── */
+
+@keyframes nebulaShift {
+  0%   { opacity: 0.70; transform: scale(1);    }
+  50%  { opacity: 1.00; transform: scale(1.06); }
+  100% { opacity: 0.80; transform: scale(1);    }
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+@keyframes popIn {
+  0%   { transform: scale(0.80); opacity: 0; }
+  65%  { transform: scale(1.07); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1;   }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes guideIn {
+  0%   { transform: scale(0.80) translateY(12px); opacity: 0; }
+  60%  { transform: scale(1.04) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1)    translateY(0);    opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 90%, 100% { transform: scaleY(1);    }
+  95%            { transform: scaleY(0.08); }
+}
+
+@keyframes floatUp {
+  0%   { transform: translateY(0)    scale(1);    opacity: 0.20; }
+  100% { transform: translateY(-55px) scale(1.5); opacity: 0;    }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0)   rotate(0deg);  }
+  33%       { transform: translateY(-14px) rotate(4deg);  }
+  66%       { transform: translateY(-7px)  rotate(-4deg); }
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0,    0)    scale(1);    }
+  25%       { transform: translate(35px, -25px) scale(1.06); }
+  50%       { transform: translate(-12px,-40px) scale(0.94); }
+  75%       { transform: translate(-28px,-12px) scale(1.03); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 18px rgba(129,140,248,0.35); }
+  50%       { box-shadow: 0 0 40px rgba(129,140,248,0.65), 0 0 60px rgba(99,102,241,0.25); }
+}
+
+@keyframes scoreReveal {
+  0%   { transform: scale(0.6);  opacity: 0; }
+  70%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes timerPanic {
+  0%, 100% { opacity: 1; transform: scale(1);    }
+  50%       { opacity: 0.6; transform: scale(1.08); }
 }
