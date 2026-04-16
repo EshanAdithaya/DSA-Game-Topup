@@ -109,7 +109,7 @@ function TopPlayers({ board, userId }) {
           style={{
             ...S.lbRow,
             ...(p.userId === userId
-              ? { background: '#eff6ff', borderColor: 'rgba(37,99,235,0.3)' }
+              ? { background: 'rgba(129,140,248,0.14)', borderColor: 'rgba(129,140,248,0.38)' }
               : {}),
           }}
         >
@@ -161,15 +161,18 @@ function RecentGames({ recent }) {
 
 const styles = {
   myRankCard: {
-    background: '#eff6ff',
-    border: '1px solid rgba(37,99,235,0.2)',
-    borderRadius: 14,
+    background: 'rgba(129,140,248,0.10)',
+    border: '1px solid rgba(129,140,248,0.28)',
+    borderRadius: 16,
     padding: '16px 20px',
     display: 'flex',
     alignItems: 'center',
     gap: 16,
     marginBottom: 20,
     flexWrap: 'wrap',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.35), 0 0 30px rgba(129,140,248,0.08)',
   },
   myRankLeft: {
     display: 'flex',
@@ -194,9 +197,12 @@ const styles = {
     display: 'flex',
     gap: 0,
     marginBottom: 16,
-    background: 'rgba(0,0,0,0.05)',
-    borderRadius: 10,
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 12,
     padding: 4,
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
   },
   tab: {
     flex: 1,
@@ -212,8 +218,9 @@ const styles = {
     fontFamily: 'inherit',
   },
   tabActive: {
-    background: COLORS.purpleFaint,
-    color: COLORS.purple,
+    background: 'rgba(129,140,248,0.20)',
+    color: '#a5b4fc',
+    boxShadow: '0 2px 10px rgba(129,140,248,0.20)',
   },
   loading: {
     textAlign: 'center',

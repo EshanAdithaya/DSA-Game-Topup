@@ -8,6 +8,12 @@ export default function MenuPage() {
 
   return (
     <div style={S.page}>
+      {/* Ambient glow orbs */}
+      <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+        <div style={{ position: 'absolute', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.09) 0%, transparent 70%)', top: '-20%', left: '-15%', animation: 'orbFloat 22s ease-in-out infinite' }} />
+        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)', top: '35%', right: '-12%', animation: 'orbFloat 28s ease-in-out infinite reverse' }} />
+        <div style={{ position: 'absolute', width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.07) 0%, transparent 70%)', bottom: '-8%', left: '28%', animation: 'orbFloat 32s ease-in-out infinite 5s' }} />
+      </div>
       <div style={{ ...S.container, maxWidth: 820, animation: 'fadeIn 0.5s ease' }}>
         {/* ── Header ── */}
         <header style={styles.header}>
@@ -142,15 +148,17 @@ const styles = {
   },
   startBtn: {
     padding: '16px 28px',
-    background: '#2563eb',
+    background: 'linear-gradient(135deg, #6366f1 0%, #818cf8 60%, #22d3ee 100%)',
     border: 'none',
-    borderRadius: 12,
+    borderRadius: 14,
     color: '#fff',
     fontSize: 17,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-    fontFamily: 'inherit',
+    boxShadow: '0 4px 28px rgba(99,102,241,0.60)',
+    fontFamily: "'Space Grotesk','Inter',system-ui,sans-serif",
+    letterSpacing: 0.3,
+    transition: 'transform 0.15s, box-shadow 0.15s',
   },
   secondaryRow: {
     display: 'flex',

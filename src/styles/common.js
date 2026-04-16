@@ -1,55 +1,55 @@
-// ─── Design Tokens — Clean Blue/White Theme ────────────────────────────────────
+// ─── Design Tokens — Dark Quantum Space Theme ────────────────────────────────
 
 export const COLORS = {
   // ── Backgrounds ──
-  bg:        '#f3f4f6',
-  bgGrad:    '#f3f4f6',
-  cardBg:    '#ffffff',
-  cardBg2:   '#f9fafb',
-  sectionBg: '#e5e7eb',
+  bg:        '#070b18',
+  bgGrad:    '#070b18',
+  cardBg:    'rgba(255,255,255,0.06)',
+  cardBg2:   'rgba(255,255,255,0.04)',
+  sectionBg: 'rgba(255,255,255,0.08)',
 
   // ── Text ──
-  text:      '#111827',
-  textMuted: '#4b5563',
-  textFaint: '#9ca3af',
+  text:      '#f1f5f9',
+  textMuted: '#94a3b8',
+  textFaint: '#475569',
 
   // ── Borders & Shadows ──
-  border:   'rgba(0,0,0,0.1)',
-  shadow:   '0 2px 12px rgba(0,0,0,0.07)',
-  shadowMd: '0 4px 24px rgba(0,0,0,0.09)',
-  shadowLg: '0 8px 40px rgba(0,0,0,0.12)',
+  border:   'rgba(255,255,255,0.10)',
+  shadow:   '0 4px 24px rgba(0,0,0,0.50)',
+  shadowMd: '0 8px 40px rgba(0,0,0,0.60)',
+  shadowLg: '0 16px 64px rgba(0,0,0,0.70)',
 
-  // ── Brand blue (replaces purple) ──
-  purple:       '#2563eb',
-  purpleLight:  '#3b82f6',
-  purpleDark:   '#1d4ed8',
-  purpleFaint:  '#eff6ff',
-  purpleBorder: 'rgba(37,99,235,0.2)',
-  purpleBg:     'rgba(37,99,235,0.05)',
+  // ── Brand: electric indigo / violet ──
+  purple:       '#818cf8',
+  purpleLight:  '#a5b4fc',
+  purpleDark:   '#6366f1',
+  purpleFaint:  'rgba(129,140,248,0.12)',
+  purpleBorder: 'rgba(129,140,248,0.28)',
+  purpleBg:     'rgba(129,140,248,0.08)',
 
-  // ── Game accent colors ──
-  cyan:     '#0891b2',
-  cyanNeon: '#0891b2',
+  // ── Neon accents ──
+  cyan:      '#22d3ee',
+  cyanNeon:  '#67e8f9',
 
-  green:     '#16a34a',
-  greenNeon: '#16a34a',
+  green:     '#10b981',
+  greenNeon: '#34d399',
 
-  yellow:     '#ca8a04',
-  yellowNeon: '#ca8a04',
+  yellow:     '#f59e0b',
+  yellowNeon: '#fbbf24',
 
-  pink:     '#db2777',
-  pinkNeon: '#db2777',
+  pink:     '#ec4899',
+  pinkNeon: '#f472b6',
 
-  red:     '#dc2626',
-  redNeon: '#dc2626',
+  red:     '#ef4444',
+  redNeon: '#f87171',
 
-  orange:     '#ea580c',
-  orangeNeon: '#ea580c',
+  orange:     '#f97316',
+  orangeNeon: '#fb923c',
 
-  // badge
-  ai:    '#2563eb',
-  aiBg:  '#eff6ff',
-  aiBorder: 'rgba(37,99,235,0.2)',
+  // ── AI badge ──
+  ai:       '#a5b4fc',
+  aiBg:     'rgba(129,140,248,0.14)',
+  aiBorder: 'rgba(129,140,248,0.32)',
 };
 
 // ─── Shared style object ───────────────────────────────────────────────────────
@@ -57,12 +57,12 @@ export const COLORS = {
 export const S = {
   page: {
     minHeight: '100vh',
-    background: COLORS.bgGrad,
+    background: 'transparent',
     position: 'relative',
     overflowX: 'hidden',
     display: 'flex',
     justifyContent: 'center',
-    fontFamily: "'Inter','Segoe UI',system-ui,sans-serif",
+    fontFamily: "'Inter','Space Grotesk','Segoe UI',system-ui,sans-serif",
   },
 
   container: {
@@ -73,10 +73,15 @@ export const S = {
     boxSizing: 'border-box',
   },
 
+  // Gradient text title
   gradTitle: {
-    color: COLORS.purple,
+    background: 'linear-gradient(135deg, #a5b4fc 0%, #818cf8 45%, #22d3ee 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
     fontWeight: 800,
     margin: '0 0 4px',
+    fontFamily: "'Space Grotesk','Inter',system-ui,sans-serif",
   },
   subtitle: {
     color: COLORS.textFaint,
@@ -86,75 +91,87 @@ export const S = {
     textTransform: 'uppercase',
   },
 
+  // ── Cards ──
   card: {
-    background: COLORS.cardBg,
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: 16,
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.10)',
+    borderRadius: 18,
     padding: '22px',
-    boxShadow: COLORS.shadow,
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07)',
   },
   purpleCard: {
-    background: COLORS.purpleFaint,
-    border: `1px solid ${COLORS.purpleBorder}`,
-    borderRadius: 16,
+    background: 'rgba(129,140,248,0.08)',
+    border: '1px solid rgba(129,140,248,0.26)',
+    borderRadius: 18,
     padding: '22px',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(129,140,248,0.10)',
   },
 
+  // ── Inputs ──
   input: {
     width: '100%',
     padding: '13px 16px',
     boxSizing: 'border-box',
-    background: '#ffffff',
-    border: '1.5px solid rgba(0,0,0,0.14)',
+    background: 'rgba(255,255,255,0.07)',
+    border: '1.5px solid rgba(255,255,255,0.12)',
     borderRadius: 10,
-    color: COLORS.text,
+    color: '#f1f5f9',
     fontSize: 15,
     fontFamily: 'inherit',
     outline: 'none',
     transition: 'border-color 0.2s, box-shadow 0.2s',
   },
 
+  // ── Buttons ──
   btnPrimary: {
     width: '100%',
     padding: '14px',
-    background: COLORS.purple,
+    background: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
     border: 'none',
-    borderRadius: 10,
+    borderRadius: 12,
     color: '#fff',
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+    boxShadow: '0 4px 22px rgba(99,102,241,0.55)',
     fontFamily: 'inherit',
+    transition: 'transform 0.15s, box-shadow 0.15s',
   },
   btnStart: {
     padding: '15px 28px',
-    background: COLORS.purple,
+    background: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
     border: 'none',
-    borderRadius: 12,
+    borderRadius: 14,
     color: '#fff',
     fontSize: 16,
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+    boxShadow: '0 4px 22px rgba(99,102,241,0.55)',
     fontFamily: 'inherit',
+    transition: 'transform 0.15s, box-shadow 0.15s',
   },
   btnSecondary: {
     padding: '12px 20px',
-    background: '#ffffff',
-    border: '1.5px solid rgba(0,0,0,0.1)',
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.14)',
     borderRadius: 12,
-    color: COLORS.text,
+    color: '#f1f5f9',
     fontSize: 14,
     fontWeight: 600,
     cursor: 'pointer',
     fontFamily: 'inherit',
-    boxShadow: COLORS.shadow,
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    transition: 'background 0.15s, border-color 0.15s, transform 0.15s',
   },
   btnLink: {
     background: 'none',
     border: 'none',
-    color: COLORS.purple,
+    color: '#a5b4fc',
     cursor: 'pointer',
     fontWeight: 600,
     fontSize: 14,
@@ -162,63 +179,73 @@ export const S = {
     fontFamily: 'inherit',
   },
   backBtn: {
-    background: '#ffffff',
-    border: '1.5px solid rgba(0,0,0,0.1)',
-    borderRadius: 8,
-    color: COLORS.textMuted,
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.14)',
+    borderRadius: 10,
+    color: '#94a3b8',
     padding: '8px 14px',
     cursor: 'pointer',
     fontSize: 14,
     fontFamily: 'inherit',
-    boxShadow: COLORS.shadow,
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    transition: 'background 0.15s, transform 0.15s',
   },
 
+  // ── Error box ──
   errBox: {
-    background: '#fef2f2',
-    border: '1.5px solid #fecaca',
+    background: 'rgba(239,68,68,0.13)',
+    border: '1px solid rgba(239,68,68,0.32)',
     borderRadius: 8,
     padding: '10px 14px',
-    color: '#b91c1c',
+    color: '#f87171',
     fontSize: 14,
   },
 
+  // ── Stat card ──
   statCard: {
     flex: 1,
     minWidth: 100,
-    background: COLORS.cardBg,
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: 14,
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.10)',
+    borderRadius: 16,
     padding: '16px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     gap: 6,
-    boxShadow: COLORS.shadow,
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
   },
 
+  // ── User chip ──
   userChip: {
     display: 'flex',
     alignItems: 'center',
     gap: 10,
-    background: '#ffffff',
-    border: `1.5px solid ${COLORS.purpleBorder}`,
+    background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(129,140,248,0.30)',
     borderRadius: 12,
     padding: '8px 14px',
-    boxShadow: COLORS.shadow,
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
   },
 
+  // ── Badge ──
   badge: {
-    background: COLORS.purpleFaint,
-    border: `1px solid ${COLORS.purpleBorder}`,
+    background: 'rgba(129,140,248,0.14)',
+    border: '1px solid rgba(129,140,248,0.32)',
     borderRadius: 20,
     padding: '4px 12px',
-    color: COLORS.purple,
+    color: '#a5b4fc',
     fontSize: 12,
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
 
+  // ── Page header ──
   pageHeader: {
     display: 'flex',
     alignItems: 'center',
@@ -226,28 +253,33 @@ export const S = {
     marginBottom: 28,
   },
   pageTitle: {
-    color: COLORS.text,
+    color: '#f1f5f9',
     fontSize: 24,
     fontWeight: 700,
     margin: 0,
+    fontFamily: "'Space Grotesk','Inter',system-ui,sans-serif",
   },
 
+  // ── Leaderboard row ──
   lbRow: {
-    background: COLORS.cardBg,
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: 12,
-    padding: '13px 18px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 14,
+    padding: '14px 18px',
     display: 'flex',
     alignItems: 'center',
     gap: 14,
-    boxShadow: COLORS.shadow,
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    transition: 'background 0.2s, border-color 0.2s',
   },
 
+  // ── Avatar ──
   avatar: {
     width: 68,
     height: 68,
     borderRadius: '50%',
-    background: COLORS.purple,
+    background: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -255,20 +287,25 @@ export const S = {
     fontSize: 28,
     fontWeight: 700,
     flexShrink: 0,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+    boxShadow: '0 4px 20px rgba(99,102,241,0.50)',
   },
 
+  // ── Question card ──
   qCard: {
-    background: COLORS.cardBg,
-    border: `2px solid ${COLORS.purpleBorder}`,
-    borderRadius: 20,
+    background: 'rgba(255,255,255,0.06)',
+    border: '1.5px solid rgba(129,140,248,0.26)',
+    borderRadius: 22,
     padding: '28px',
-    boxShadow: COLORS.shadowMd,
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07)',
   },
+
+  // ── Option button ──
   optBtn: {
-    background: '#ffffff',
-    border: '1.5px solid rgba(0,0,0,0.1)',
-    borderRadius: 12,
+    background: 'rgba(255,255,255,0.05)',
+    border: '1.5px solid rgba(255,255,255,0.10)',
+    borderRadius: 14,
     padding: '15px 16px',
     cursor: 'pointer',
     display: 'flex',
@@ -276,42 +313,47 @@ export const S = {
     gap: 12,
     textAlign: 'left',
     fontFamily: 'inherit',
-    transition: 'all 0.15s ease',
-    boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+    transition: 'all 0.18s ease',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
   },
   optLetter: {
-    width: 34,
-    height: 34,
+    width: 36,
+    height: 36,
     borderRadius: '50%',
     flexShrink: 0,
-    background: COLORS.purpleFaint,
-    border: `1.5px solid ${COLORS.purpleBorder}`,
+    background: 'rgba(129,140,248,0.15)',
+    border: '1.5px solid rgba(129,140,248,0.38)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: COLORS.purple,
+    color: '#a5b4fc',
     fontWeight: 700,
     fontSize: 14,
   },
+
+  // ── Feature tag ──
   featureTag: {
-    color: COLORS.textMuted,
+    color: '#94a3b8',
     fontSize: 13,
-    padding: '5px 11px',
-    background: '#ffffff',
+    padding: '5px 12px',
+    background: 'rgba(255,255,255,0.06)',
     borderRadius: 8,
-    border: `1px solid ${COLORS.border}`,
+    border: '1px solid rgba(255,255,255,0.10)',
   },
+
+  // ── Step number ──
   stepN: {
     width: 34,
     height: 34,
     borderRadius: 8,
     flexShrink: 0,
-    background: COLORS.purpleFaint,
-    border: `1.5px solid ${COLORS.purpleBorder}`,
+    background: 'rgba(129,140,248,0.15)',
+    border: '1.5px solid rgba(129,140,248,0.38)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: COLORS.purple,
+    color: '#a5b4fc',
     fontWeight: 700,
     fontSize: 12,
   },
@@ -319,39 +361,39 @@ export const S = {
 
 export const globalCss = `
   @keyframes floatUp {
-    0%   { transform: translateY(0) scale(1);       opacity: 0.12; }
-    100% { transform: translateY(-40px) scale(1.3); opacity: 0.4; }
+    0%   { transform: translateY(0) scale(1);       opacity: 0.18; }
+    100% { transform: translateY(-55px) scale(1.5); opacity: 0; }
   }
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50%       { opacity: 0.55; }
+    50%       { opacity: 0.5; }
   }
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
   @keyframes popIn {
-    0%   { transform: scale(0.85); opacity: 0; }
-    70%  { transform: scale(1.05); }
+    0%   { transform: scale(0.80); opacity: 0; }
+    65%  { transform: scale(1.07); }
     100% { transform: scale(1);    opacity: 1; }
   }
   @keyframes guideIn {
-    0%   { transform: scale(0.8) translateY(10px); opacity: 0; }
-    60%  { transform: scale(1.03) translateY(-2px); opacity: 1; }
-    100% { transform: scale(1) translateY(0);       opacity: 1; }
+    0%   { transform: scale(0.80) translateY(12px); opacity: 0; }
+    60%  { transform: scale(1.04) translateY(-2px); opacity: 1; }
+    100% { transform: scale(1)    translateY(0);    opacity: 1; }
   }
   @keyframes blink {
     0%, 90%, 100% { transform: scaleY(1); }
-    95%           { transform: scaleY(0.1); }
+    95%            { transform: scaleY(0.08); }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: #f3f4f6; }
+  body { margin: 0; background: #070b18; }
   input:focus {
-    border-color: rgba(37,99,235,0.5) !important;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
+    border-color: rgba(129,140,248,0.65) !important;
+    box-shadow: 0 0 0 3px rgba(129,140,248,0.18) !important;
   }
   button { font-family: inherit; }
 `;
