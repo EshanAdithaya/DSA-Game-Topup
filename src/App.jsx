@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GameProvider } from './context/GameContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { globalCss } from './styles/common';
 
 // Pages
 import LoginPage       from './pages/LoginPage';
@@ -13,6 +15,16 @@ import ProfilePage     from './pages/ProfilePage';
 import GameOverPage    from './pages/GameOverPage';
 
 export default function App() {
+  useEffect(() => {
+    const el = document.createElement('style');
+    el.id = 'quantum-global-css';
+    el.textContent = globalCss;
+    if (!document.getElementById('quantum-global-css')) {
+      document.head.appendChild(el);
+    }
+    return () => el.remove();
+  }, []);
+
   return (
     <BrowserRouter>
       <GameProvider>
