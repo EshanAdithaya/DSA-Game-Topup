@@ -170,7 +170,7 @@ export default function PlayingPage() {
                   }}
                 >
                   <span style={S.optLetter}>{letter}</span>
-                  <span style={{ color: COLORS.text }}>{text}</span>
+                  <span style={{ color: '#e2e8f0', fontSize: 14, lineHeight: 1.4 }}>{text}</span>
                 </button>
               );
             })}
@@ -304,7 +304,7 @@ const styles = {
     fontSize: 18,
   },
   questionText: {
-    color: COLORS.text,
+    color: '#f1f5f9',
     fontSize: 19,
     lineHeight: 1.7,
     marginBottom: 24,
@@ -324,7 +324,7 @@ const styles = {
   },
   explanation: {
     display: 'block',
-    color: COLORS.textMuted,
+    color: '#94a3b8',
     fontSize: 13,
     marginTop: 4,
     fontWeight: 400,
