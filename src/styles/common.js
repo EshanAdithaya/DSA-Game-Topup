@@ -57,7 +57,12 @@ export const COLORS = {
 export const S = {
   page: {
     minHeight: '100vh',
-    background: 'transparent',
+    background: '#070b18',
+    backgroundImage: [
+      'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(99,102,241,0.20) 0%, transparent 55%)',
+      'radial-gradient(ellipse 60% 70% at 85% 85%, rgba(6,182,212,0.13) 0%, transparent 55%)',
+      'radial-gradient(ellipse 35% 35% at 90% 15%, rgba(236,72,153,0.10) 0%, transparent 50%)',
+    ].join(', '),
     position: 'relative',
     overflowX: 'hidden',
     display: 'flex',
