@@ -11,7 +11,7 @@ export const COLORS = {
   // ── Text ──
   text:      '#f1f5f9',
   textMuted: '#94a3b8',
-  textFaint: '#475569',
+  textFaint: '#64748b',
 
   // ── Borders & Shadows ──
   border:   'rgba(255,255,255,0.10)',
