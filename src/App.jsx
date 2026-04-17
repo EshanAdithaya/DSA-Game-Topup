@@ -29,7 +29,7 @@ export default function App() {
     <BrowserRouter>
       <GameProvider>
         <Routes>
-          {/* Public routes */}
+          {/* Public routes*/}
           <Route path="/login"    element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
